@@ -26,10 +26,14 @@ async def main():
         Step-6: Extract the source of the news article
         Step-7: Store this output in a JSON file.""",
         llm=ChatGoogle(model="gemini-1.5-flash",
-                       api_key=os.getenv("GROQ_API_KEY"))
+                       api_key=os.getenv("GOOGLE_API_KEY"))
     )
 
     history = await agent.run()
+    print(history)
+
+    # results = history.messages[-1].content
+    # print(results)
 
 if __name__ == "__main__":
     asyncio.run(main())

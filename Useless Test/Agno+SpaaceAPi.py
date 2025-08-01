@@ -59,7 +59,7 @@ for article in articles:
     print(f"🔎 Summary: {article['summary']}\n")
 
     # Use WebsiteTool directly to extract the full article
-    content = space_article_extractor.run(article["url"])
+    content = space_article_extractor.read_url(article["url"])
 
     # Print structured output
     print(f"---\n**📝 Structured Article:**\n")

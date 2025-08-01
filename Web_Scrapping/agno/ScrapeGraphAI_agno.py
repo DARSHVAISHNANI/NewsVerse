@@ -12,7 +12,7 @@ Latest_Article_Searcher = Agent(
     name="TopicExtractor",
     model=Gemini(id="gemini-2.0-flash"),
     description=(
-        "You're an expert web researcher who specializes in identifying the most trending and relevant news topics "
+        "You're an expert web researcher who specializes in identifying the most trending and relevant news topics like AI, War, Politics, Technology."
         "that people are currently reading. Your job is to search the internet using DuckDuckGo, extract the titles "
         "or themes of the most talked-about or recent articles, and prepare them for further processing."
     ),
@@ -75,10 +75,15 @@ Article_Extract_agent = Agent(
 agent_team = Agent(
     team=[Latest_Article_Searcher, URL_Extractor_Agent, Article_Extract_agent],
     model=Gemini(id="gemini-2.0-flash"),
-    instructions=["First execute the url from the URL_Extractor_Agent and then take each url and Extract or web scrape the article content of each url in a structured format like title, full_description, source, date, time, and paste the url from the agent."],
+    instructions=["Step 1: Ask Latest_Article_Searcher to fetch a list of trending article URLs.",
+        "Step 2: For each URL, ask URL_Extractor_Agent to extract url of latest article.",
+        "Step 3: Ask Article_Extract_agent to extract a 500-word body and all the other meta like title, full_description, source, date, time, url from each URL.",
+        "Step 4: Combine metadata with the body into a structured object with fields: title, full_description, source, date, time, url.",
+        "Ensure that full_description has approximately 500 words, taken from the article’s main body.",
+        "Return the list of these complete article objects."],
     markdown=True,
     show_tool_calls=True,
     monitoring=True
 )
 
-agent_team.print_response("Extract 3 latest news article url from well know news websites", stream=True)
+agent_team.print_response("Extract 3 latest news data including title, date, time, source, url, and 500-word full_description from well know news websites ", stream=True)

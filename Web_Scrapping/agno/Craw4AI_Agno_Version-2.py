@@ -1,99 +1,103 @@
-from agno.agent import Agent
+import os
+import time
 from textwrap import dedent
-from agno.models.google import Gemini
+from typing import Optional, List
+
+from dotenv import load_dotenv
+from pydantic import BaseModel, Field, HttpUrl
+
+from agno.agent import Agent
 from agno.models.groq import Groq
 from agno.tools.crawl4ai import Crawl4aiTools
 from agno.tools.duckduckgo import DuckDuckGoTools
-import os
-from dotenv import load_dotenv
-import time
+
 load_dotenv()
 
+# 1. Pydantic parser model defined for structured output
+class Article(BaseModel):
+    """A structured representation of a news article."""
+    title: str = Field(..., description="The exact headline of the article")
+    full_description: str = Field(
+        ...,
+        min_length=200,
+        description="The complete body or main content of the article, at least 200 words long."
+    )
+    source: str = Field(..., description="The website or publication source (e.g., Bloomberg, BBC)")
+    date: Optional[str] = Field(None, description="The publishing date in YYYY-MM-DD format.")
+    time: Optional[str] = Field(None, description="The publishing time in HH:MM format.")
+    url: HttpUrl = Field(..., description="The working URL of the news article.")
+
 start_time = time.time()
-#Create a agent that can extract latest news topic on which article url can be crawl
+
+# Agent to find 3 trending topics
 Latest_Article_Searcher = Agent(
     name="TopicExtractor",
     model=Groq(id="qwen/qwen3-32b"),
-    description=(
-        "You're an expert web researcher who specializes in identifying the most trending and relevant news topics "
-        "that people are currently reading. Your job is to search the internet using DuckDuckGo, extract the titles "
-        "or themes of the most talked-about or recent articles, and prepare them for further processing."
-    ),
+    description="An expert web researcher who identifies trending news topics.",
     instructions=[
-        "Use DuckDuckGo to search for the latest trending news articles.",
-        "From the top 5 search results, extract clear and concise topic names that best describe the article content.",
-        "Return only the topic name (not the URL or summary) to the URLFetcher tool.",
-        "Avoid repeating the same topic in different forms.",
-        "Ensure the topic is fresh, relevant, and easy to understand."
+        "Use DuckDuckGo to search for the latest trending news.",
+        "From the search results, extract **exactly 3** clear and distinct topic names.",
+        "Return only the list of 3 topic names."
     ],
     tools=[DuckDuckGoTools()],
     markdown=True,
-    show_tool_calls=True
+    show_tool_calls=True,
 )
 
-#Create a agent that can extract latest news article url
+# Agent to find a URL for a given topic
 URL_Extractor_Agent = Agent(
     name="URLFetcher",
-    model =Groq(id="qwen/qwen3-32b"),
-    description="You are an expert content finder. Your task is to find the URL of the latest article on any topic but must be latest.",
-    instructions= [
-         "Use Crawl4ai tool to search for articles.",
-        "Return the URL of the article with the latest publication date.",
-        "If no publication date is found, use the first valid article."
+    model=Groq(id="qwen/qwen3-32b"),
+    description="An expert content finder that gets the best URL for a news topic.",
+    instructions=[
+        "Given a topic, use DuckDuckGo to find 3 most recent article URL from a major news source.",
+        "Return only the single, direct URL of the article.",
     ],
-    tools=[Crawl4aiTools()],
+    # 2. Corrected tool to use DuckDuckGo for searching, not Crawl4ai
+    tools=[DuckDuckGoTools()],
     markdown=True,
-    show_tool_calls=True
+    show_tool_calls=True,
 )
 
-# Using Crawl4ai, extract the contain of each url that is extracted by ArticleFetcher will given.
-# crawl_toolkit = Crawl4aiToolkit()
+pm = Groq(id="llama3-70b-8192")
+
+# Agent to extract content from a URL
 Article_Extract_agent = Agent(
     name="ArticleFetcher",
     model=Groq(id="qwen/qwen3-32b"),
-    description= "You are an expert news content extractor.",
-    instructions= dedent("""
-    You are an expert news content extractor.
-
-    From the provided URL, extract **only the latest news article** in the following structured format:
-
-    - title: The exact headline of the article
-    - full_description: The complete body or main content of the article must be atlest 200 words.
-    - source: The website or publication source (e.g., Bloomberg, BBC, The New york times)
-    - date: The publishing date in YYYY-MM-DD format if available. 
-      If not present in metadata, scan the page for phrases like "Published on July 18, 2025".
-    - time: The publishing time in HH:MM format if available. 
-      Look for metadata or extract from text like "8:34 AM" or "08:34".
-    - url: The URL of the news article and make sure that the url is working properly or other wise the URL_Extractor url must be paste which is accessable to user.
-
-    If multiple articles are on the page, choose the most recent or most prominent one. 
-    Be precise and use pattern matching where metadata is missing.
-    """).strip(),
-    tools=[Crawl4aiTools(max_length=1000)],
-    reasoning=True,
+    description="An expert news content extractor that uses Crawl4ai to scrape a URL and structure the data.",
+    instructions="From the provided URL, use the Crawl4ai tool to extract the main article's content and structure it according to the Article model.",
+    tools=[Crawl4aiTools(max_length=4000)], # Increased max_length for full articles
+    # 3. Using the Pydantic model to enforce structured output
+    parser_model=pm,
+    references_format=Article,
     markdown=True,
-    show_tool_calls=True
+    show_tool_calls=True,
 )
 
-#Combine this both ai agent to create a team
+# Combine agents into a team
 agent_team = Agent(
     team=[Latest_Article_Searcher, URL_Extractor_Agent, Article_Extract_agent],
     model=Groq(id="qwen/qwen3-32b"),
-    instructions=["First execute the url from the URL_Extractor_Agent and then take each url and Extract or web scrape the article content of each url in a structured format like title, full_description, source, date, time, and paste the url from the agent."],
+    instructions=[
+        "First, use TopicExtractor to get exactly 3 news topics.",
+        "Then, for each topic, use URLFetcher to find atmost 3 its article URL.",
+        "Finally, for each URL, use ArticleFetcher to extract the structured content.",
+        "Compile the 3 structured articles for the final output."
+    ],
     markdown=True,
     show_tool_calls=True,
-    monitoring=True
+    monitoring=True,
 )
 
+# 4. A clearer, more effective final prompt for the team
 agent_team.print_response(
-    "Step 1: Use TopicExtractor to identify trending news topics that people are reading today.\n"
-    "Step 2: For each topic, use URLFetcher to find the most recent article URL from a well-known news site as much as possible.\n"
-    "Step 3: For each URL, use Crawl4ai with WebCrawler to extract structured article content including:\n"
-    "- title\n- full_description atlest 200 words long\n- source\n- date\n- time\n- url\n\n"
-    "Return the final output as a list of structured news articles.",
+    "Identify exactly 3 trending news topics from today, July 31, 2025. For each topic, find a "
+    "corresponding article URL and extract its content into a structured format. "
+    "Return the final output as a list of 3 structured news articles.",
     stream=True
 )
 
 end_time = time.time()
 
-print("Total Time Taken To Run: "+ str(end_time-start_time))
+print(f"\nTotal Time Taken To Run: {end_time - start_time:.2f} seconds")
