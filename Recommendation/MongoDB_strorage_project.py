@@ -8,15 +8,10 @@ from agno.embedder.google import GeminiEmbedder
 from pathlib import Path
 
 load_dotenv()
-# MongoDB Atlas connection string
-"""
-Example connection strings:
-"mongodb+srv://<username>:<password>@cluster0.mongodb.net/?retryWrites=true&w=majority"
-"mongodb://localhost/?directConnection=true"
-"""
+
 mdb_connection_string = "mongodb+srv://darshvaishnani1234:wAssPV9RS3dm55la@newscluster.p2duvnj.mongodb.net/"
 
-COLLECTION_NAME = "NewsVerse"
+COLLECTION_NAME = "NewsVerseCo"
 
 vector_db = MongoDb(
         collection_name=COLLECTION_NAME,

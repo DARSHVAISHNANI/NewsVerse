@@ -2,3 +2,6 @@ autogen-agentchat
 autogen-core
 autogen-ext
 asyncio
+dotenv
+tiktoken
+openai
