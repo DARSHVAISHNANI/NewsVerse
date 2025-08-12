@@ -45,11 +45,11 @@ def upload_to_mongodb(json_file_path, connection_string, db_name, collection_nam
 
 if __name__ == '__main__':
     # --- PLEASE REPLACE THESE VALUES WITH YOURS ---
-    JSON_FILE = r'C:\Users\darsh\Desktop\Main Documents Folder\NewsVerse\Recommendation\extracted_articles.json'
+    JSON_FILE = r'C:\Users\darsh\Downloads\user_database.json'
     # Replace the uri string with your MongoDB deployment's connection string.
     CONN_STRING = "mongodb+srv://darshvaishnani1234:wAssPV9RS3dm55la@newscluster.p2duvnj.mongodb.net/"
-    DB_NAME = "NewsVerseDB"
-    COLLECTION_NAME = "NewsVerseCo"
+    DB_NAME = "UserDB"
+    COLLECTION_NAME = "UserCo"
     # ----------------------------------------------
 
     upload_to_mongodb(JSON_FILE, CONN_STRING, DB_NAME, COLLECTION_NAME)
