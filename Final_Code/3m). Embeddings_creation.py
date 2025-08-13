@@ -3,10 +3,12 @@ import certifi
 from sentence_transformers import SentenceTransformer
 import numpy as np
 
+#all-MiniLM-L6-v2
+
 client = MongoClient("mongodb+srv://darshvaishnani1234:wAssPV9RS3dm55la@newscluster.p2duvnj.mongodb.net/", tlsCAFile=certifi.where())
 news_col = client["NewsVerseDB"]["NewsVerseCo"]
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
+model = SentenceTransformer("all-mpnet-base-v2")
 
 def store_article_embeddings():
     for article in news_col.find({"embedding": {"$exists": False}}):

@@ -24,11 +24,11 @@ for article in stories:
 
     extracted = {
         "title": article.get("title", "").strip(),
-        "body": clean_html(article.get("body", "")),
+        "url": article.get("url", ""),
+        "source": "Benzinga",
         "date": date,
         "time": time,
-        "source": "Benzinga",
-        "url": article.get("url", "")
+        "content": clean_html(article.get("body", "")),
     }
     extracted_article.append(extracted)
 
