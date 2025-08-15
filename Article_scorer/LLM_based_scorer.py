@@ -90,9 +90,10 @@ def score_all_articles():
 
         # Get user_article_score if exists
         for doc in docs:
-            if "user_article_score" in doc:
-                user_score = doc["user_article_score"]
-                break
+            if "article_score" in doc and isinstance(doc["article_score"], dict):
+                if "user_article_score" in doc["article_score"]:
+                    user_score = doc["article_score"]["user_article_score"]
+                    break
 
         # Always get fresh llm_score
         doc = docs[0]  # pick one representative article
@@ -120,8 +121,11 @@ def score_all_articles():
             news_col.update_one(
                 {"_id": doc["_id"]},
                 {"$set": {
-                    "llm_score": llm_score,
-                    "final_custom_score": final_score
+                    "article_score": {
+                        "user_article_score": user_score,
+                        "llm_score": llm_score,
+                        "final_custom_score": final_score
+                    }
                 }}
             )
 

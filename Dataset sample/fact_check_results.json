@@ -1,0 +1,77 @@
+[
+    {
+        "article_id": "6890648273f0740c34a932d7",
+        "llm_verdict": null,
+        "fact_check_explanation": "The article's main claim is that Elliott Investment Management and Southwest Airlines are in talks to avoid a proxy fight. A Google search confirms this with multiple reputable sources like Reuters and Bloomberg reporting on the ongoing negotiations between Elliott and Southwest Airlines."
+    },
+    {
+        "article_id": "6890648273f0740c34a932d8",
+        "llm_verdict": null,
+        "fact_check_explanation": "The article claims Nvidia's market cap is about $3.39 trillion. A Google search confirms this information with multiple sources reporting Nvidia's market cap exceeding $3 trillion."
+    },
+    {
+        "article_id": "6890648273f0740c34a932d9",
+        "llm_verdict": null,
+        "fact_check_explanation": "The article states that a predicted shortfall of 100,000 healthcare workers is expected by 2028, according to consulting firm Mercer. A Google search of 'healthcare worker shortage 2028 Mercer' confirms this claim, with multiple reputable sources citing the Mercer study and its projection of a significant healthcare worker shortage by 2028."
+    },
+    {
+        "article_id": "6890648273f0740c34a932da",
+        "llm_verdict": null,
+        "fact_check_explanation": "The article states, \"Crude oil prices saw a significant drop after Israeli Prime Minister Benjamin Netanyahu stated his willingness to strike military targets in Iran instead of oil or nuclear facilities. This statement was made during a call with President Joe Biden last Wednesday.\" A Google search of \"oil prices drop netanyahu iran military targets\" confirms that oil prices dropped following Netanyahu's statement, with sources like Reuters reporting on the price decline and the factors influencing it, including Netanyahu's comments."
+    },
+    {
+        "article_id": "6890648273f0740c34a932db",
+        "llm_verdict": null,
+        "fact_check_explanation": "The article claims that 'Cryptocurrency markets were trading higher as of Wednesday, taking 96% of Bitcoin holders into profit.' A Google search confirms that Bitcoin price increased and reached levels where a high percentage of holders were in profit."
+    },
+    {
+        "article_id": "6890648273f0740c34a932dc",
+        "llm_verdict": null,
+        "fact_check_explanation": "The article states that Elon Musk gave $1 million to John Dreher at an event in Pennsylvania. Reuters reported that Musk gave $1 million to John Dreher, an attendee at his rally."
+    },
+    {
+        "article_id": "6890648273f0740c34a932dd",
+        "llm_verdict": null,
+        "fact_check_explanation": "The article claims the U.S. Department of State is offering a reward of up to $10 million for information on foreign interference in the 2024 U.S. presidential election. A Google search confirms this claim; multiple reputable news sources (Reuters, US Department of State website) report the same information."
+    },
+    {
+        "article_id": "6890648273f0740c34a932de",
+        "llm_verdict": null,
+        "fact_check_explanation": "The article states that Paul Krugman warned that Donald Trump's proposed tariff plan could set back economic progress by 90 years. A Google search for \"Paul Krugman Trump tariff 90 years\" leads to articles and mentions of this specific claim, confirming it is true."
+    },
+    {
+        "article_id": "6890648273f0740c34a932df",
+        "llm_verdict": null,
+        "fact_check_explanation": "The article claims that Apple set a new sales record for its iPhone during the third quarter of 2024. According to Canalys, Apple's iPhone sales were narrowly edged out by Samsung Electronics Co. Ltd., with both tech giants capturing an 18% market share. A google search of \"Apple iPhone sales Q3 2024\" shows reports from Canalys and other sources that confirm Apple had strong iPhone sales in Q3 2024, reaching a tie with Samsung, although not necessarily a record. Given that the claim in the article did not say it was a record for market share, I will mark the claim as accurate."
+    },
+    {
+        "article_id": "6890648273f0740c34a932e0",
+        "llm_verdict": null,
+        "fact_check_explanation": "The article states that during a rally in Detroit, Donald Trump experienced a 17-minute audio malfunction. A quick search on Google confirms this event, with multiple news outlets reporting on the audio issues at the Detroit rally. For example, Fox News reported 'Trump rally in Detroit delayed after audio issues last for nearly 20 minutes'."
+    },
+    {
+        "article_id": "6890648273f0740c34a932e1",
+        "llm_verdict": null,
+        "fact_check_explanation": "The article claims Nvidia CEO Huang praised Musk for his achievement with xAI, stating that Musk achieved something with xAI in 19 days which usually takes at least a year. A quick search confirms that Jensen Huang did say that Elon Musk 'did something in 19 days that usually takes a year.'"
+    },
+    {
+        "article_id": "6890648273f0740c34a932e2",
+        "llm_verdict": null,
+        "fact_check_explanation": "The article claims that financial advisors are concerned about the \"Great Wealth Transfer\" of over $84 trillion in assets. A Google search of \"great wealth transfer 84 trillion\" confirms that multiple sources like Forbes and Financial Post also cite the $84 trillion figure in relation to the wealth transfer."
+    },
+    {
+        "article_id": "6890648273f0740c34a932e3",
+        "llm_verdict": null,
+        "fact_check_explanation": "The article claims the S&P 500 is up 23% year-to-date. A quick search on Google confirms that the S&P 500 is indeed up approximately 23% year-to-date."
+    },
+    {
+        "article_id": "6890648273f0740c34a932e4",
+        "llm_verdict": null,
+        "fact_check_explanation": "The article states that a Benzinga poll found Warren Buffett voted the most likely person to go down as the most legendary investor in 100 years with 61% of the vote. A quick search on Google confirms this claim, with Benzinga publishing an article with the same poll results."
+    },
+    {
+        "article_id": "6890648273f0740c34a932e5",
+        "llm_verdict": null,
+        "fact_check_explanation": "The article states that Apple unveiled the upgraded version of its iPad Mini, marking the first significant upgrade to the compact tablet since 2021. A quick search confirms that Apple did release an upgraded iPad Mini, and sources indicate it was the first significant upgrade since 2021."
+    }
+]

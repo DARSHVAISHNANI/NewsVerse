@@ -1,0 +1,122 @@
+[
+    {
+        "title": "southwest airlines in settlement talks with activist investor elliott management to avoid proxy fight for board control: report",
+        "user_article_score": 7,
+        "llm_score": 6,
+        "final_custom_score": 6.4,
+        "score_reason": "The article covers the ongoing settlement talks between Elliott Management and Southwest Airlines, including Elliott's demands and Southwest's initial resistance. It also provides context on Elliott's stake in the airline and its reasons for seeking board representation.",
+        "scored_by": "Gemini-2.0-flash"
+    },
+    {
+        "title": "nvidia stock is up over 233% in the past year and tech bulls say it could go even higher from here: '…you'll see the stock double over the next several years'",
+        "user_article_score": 7,
+        "llm_score": 6,
+        "final_custom_score": 6.4,
+        "score_reason": "The article provides expert opinions and price targets for Nvidia, offering a good overview of market sentiment and potential future growth. It includes some numerical data. However, it could benefit from deeper analysis of Nvidia's financials or competitive landscape.",
+        "scored_by": "Gemini-2.0-flash"
+    },
+    {
+        "title": "nvidia, google and microsoft to present ai tools aimed at reducing healthcare worker burnout at las vegas conference",
+        "user_article_score": 7,
+        "llm_score": 6,
+        "final_custom_score": 6.4,
+        "score_reason": "The article provides a good overview of AI tools being presented at a healthcare conference, with specific examples from Nvidia, Google, and Microsoft. It highlights the problem of healthcare worker burnout and how AI aims to solve it. However, it lacks in-depth technical details about the AI tools themselves.",
+        "scored_by": "Gemini-2.0-flash"
+    },
+    {
+        "title": "peter schiff criticizes trump's tariff strategy, oil prices drop following netanyahu's statement, kamala harris pledges to remove unnecessary degree requirements and more: top political updates this week",
+        "user_article_score": 7,
+        "llm_score": 5,
+        "final_custom_score": 5.8,
+        "score_reason": "The article summarizes multiple political and economic updates from the week. It covers basic points of each event but lacks in-depth analysis or detailed background information.",
+        "scored_by": "Gemini-2.0-flash"
+    },
+    {
+        "title": "bitcoin landfill lawsuit, coinbase ceo's musk admiration, anthony scaramucci's btc investment and more: this week in crypto",
+        "user_article_score": 7,
+        "llm_score": 5,
+        "final_custom_score": 5.8,
+        "score_reason": "The article summarizes a few crypto news stories, covering the basics but without significant depth.",
+        "scored_by": "Gemini-2.0-flash"
+    },
+    {
+        "title": "elon musk's pro-trump super pac to give $1m every day to people in swing states for signing his petition",
+        "user_article_score": 7,
+        "llm_score": 6,
+        "final_custom_score": 6.4,
+        "score_reason": "The article provides details about Elon Musk's financial contributions to a pro-Trump PAC and his efforts to campaign for Trump in swing states. It mentions specific amounts of money being given away and the purpose of the online petition. However, it could benefit from additional context or analysis regarding the potential impact of these actions on the election or the legal and ethical considerations involved.",
+        "scored_by": "Gemini-2.0-flash"
+    },
+    {
+        "title": "us offers $10m reward for intel on russian firm interfering in elections",
+        "user_article_score": 7,
+        "llm_score": 6,
+        "final_custom_score": 6.4,
+        "score_reason": "The article offers specific details about the reward being offered and names the Russian firm, Rybar LLC, along with its activities. It also mentions the connection to Rostec and the social media channels used for interference. However, it could benefit from more context.",
+        "scored_by": "Gemini-2.0-flash"
+    },
+    {
+        "title": "cuban vs ackman, dalio's advice to china, krugman's warning, and more: this week in economics",
+        "user_article_score": 7,
+        "llm_score": 5,
+        "final_custom_score": 5.8,
+        "score_reason": "The article summarizes several financial news items, providing a brief overview of each. However, it lacks in-depth analysis or original insights, functioning more as a news aggregator.",
+        "scored_by": "Gemini-2.0-flash"
+    },
+    {
+        "title": "apple's week in review: from termining self-driving car permit to setting iphone sales records",
+        "user_article_score": 7,
+        "llm_score": 6,
+        "final_custom_score": 6.4,
+        "score_reason": "The article summarizes multiple Apple-related news items from the past week, providing brief details on each. It covers the abandonment of the self-driving car project, a secret partnership with BYD, record-breaking iPhone sales, a low-cost Vision Pro, and inventory shortages. It provides enough detail to understand the key aspects of each story, but it does not go into extreme depth. It reads like a summary of larger articles.",
+        "scored_by": "Gemini-2.0-flash"
+    },
+    {
+        "title": "trump's rally hits a sour note: audio woes and frustrations in detroit",
+        "user_article_score": 7,
+        "llm_score": 4,
+        "final_custom_score": 5.2,
+        "score_reason": "The article covers a specific event (audio issues at a Trump rally) but lacks depth. It briefly mentions the impact on the campaign but doesn't offer a detailed analysis or broader context.",
+        "scored_by": "Gemini-2.0-flash"
+    },
+    {
+        "title": "ai power demand skyrockets, nvidia ceo lauds openai, and tesla's optimus robots assisted by humans: this week in ai",
+        "user_article_score": 7,
+        "llm_score": 5,
+        "final_custom_score": 5.8,
+        "score_reason": "The article summarizes key events in AI but lacks in-depth analysis or unique insights. It's more of a recap than a deep dive.",
+        "scored_by": "Gemini-2.0-flash"
+    },
+    {
+        "title": "'great wealth transfer' poses both risks and opportunities for financial advisors",
+        "user_article_score": 7,
+        "llm_score": 6,
+        "final_custom_score": 6.4,
+        "score_reason": "The article presents a focused overview of the challenges and strategies financial advisors face concerning the \"Great Wealth Transfer.\" It incorporates findings from a survey, discusses retention strategies, and prospecting efforts. However, it lacks a more in-depth analysis or alternative perspectives, which limits the overall depth.",
+        "scored_by": "Gemini-2.0-flash"
+    },
+    {
+        "title": "market 'mega-bubble' set to pop, says top economist who called 2008 crash",
+        "user_article_score": 7,
+        "llm_score": 5,
+        "final_custom_score": 5.8,
+        "score_reason": "The article provides a basic overview of David Rosenberg's market concerns, including specific points such as high valuations and investor sentiment, but it doesn't delve deeply into the underlying economic data or provide alternative perspectives, thus lacking greater depth.",
+        "scored_by": "Gemini-2.0-flash"
+    },
+    {
+        "title": "warren buffett's words of wisdom: benzinga readers pick their favorite oracle of omaha quote",
+        "user_article_score": 7,
+        "llm_score": 5,
+        "final_custom_score": 5.8,
+        "score_reason": "The article provides a basic overview of a Benzinga poll regarding Warren Buffett's most resonant quotes. It lacks in-depth analysis or new insights beyond the poll results.",
+        "scored_by": "Gemini-2.0-flash"
+    },
+    {
+        "title": "consumer tech news (oct 14-18): biden administration considers imposing restrictions on chip sales, apple inks secret deal with byd & more",
+        "user_article_score": 7,
+        "llm_score": 6,
+        "final_custom_score": 6.4,
+        "score_reason": "The article covers a range of tech news topics, providing some detail on each. It includes updates on cybersecurity, gaming, smartphones, social media, AI, and chip manufacturing. However, it lacks deep analysis or unique insights, making it a good but not exceptional overview.",
+        "scored_by": "Gemini-2.0-flash"
+    }
+]
