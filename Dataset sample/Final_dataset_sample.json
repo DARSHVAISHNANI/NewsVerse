@@ -393,12 +393,16 @@
             -0.05218299478292465,
             0.033633943647146225
         ],
-        "llm_score": 6,
-        "sentiment_label": "neutral",
-        "user_verdict": "true",
-        "verdict": true,
-        "fact_check_explanation": "This is a placeholder fact-check explanation for demonstration.",
-        "user_article_score": 7
+        "fact_check": {
+            "verdict": true,
+            "fact_check_explanation": "The article's main claim is that Elliott Investment Management and Southwest Airlines are in talks for a settlement to avoid a proxy fight, potentially giving Elliott board representation. A Google search confirms this, with reputable sources like Reuters also reporting on the settlement talks and the possibility of Elliott gaining board seats."
+        },
+        "article_score": {
+            "user_article_score": 7,
+            "llm_score": 6,
+            "final_custom_score": 6.4
+        },
+        "sentiment": "Neutral"
     },
     {
         "_id": "6890648273f0740c34a932d8",
@@ -794,12 +798,16 @@
             -0.032816510647535324,
             0.04659968242049217
         ],
-        "llm_score": 6,
-        "sentiment_label": "neutral",
-        "user_verdict": "true",
-        "verdict": true,
-        "fact_check_explanation": "This is a placeholder fact-check explanation for demonstration.",
-        "user_article_score": 7
+        "fact_check": {
+            "verdict": true,
+            "fact_check_explanation": "The article states that Nvidia's market cap is about $3.39 trillion. A Google search confirms that Nvidia's market cap is around $3.33 trillion as of June 10, 2024, which aligns with the article's claim."
+        },
+        "article_score": {
+            "user_article_score": 7,
+            "llm_score": 6,
+            "final_custom_score": 6.4
+        },
+        "sentiment": "Positive"
     },
     {
         "_id": "6890648273f0740c34a932d9",
@@ -1195,12 +1203,16 @@
             0.02768537402153015,
             0.0014869535807520151
         ],
-        "llm_score": 6,
-        "sentiment_label": "neutral",
-        "user_verdict": "true",
-        "verdict": true,
-        "fact_check_explanation": "This is a placeholder fact-check explanation for demonstration.",
-        "user_article_score": 7
+        "fact_check": {
+            "verdict": true,
+            "fact_check_explanation": "The article states that a predicted shortfall of 100,000 healthcare workers is expected by 2028, according to consulting firm Mercer. A Google search for \"healthcare worker shortage 2028 Mercer\" shows reports from Mercer estimating a shortage around that number."
+        },
+        "article_score": {
+            "user_article_score": 7,
+            "llm_score": 6,
+            "final_custom_score": 6.4
+        },
+        "sentiment": "Positive"
     },
     {
         "_id": "6890648273f0740c34a932da",
@@ -1596,12 +1608,16 @@
             0.04591307416558266,
             0.04613622650504112
         ],
-        "llm_score": 5,
-        "sentiment_label": "neutral",
-        "user_verdict": "true",
-        "verdict": true,
-        "fact_check_explanation": "This is a placeholder fact-check explanation for demonstration.",
-        "user_article_score": 7
+        "fact_check": {
+            "verdict": true,
+            "fact_check_explanation": "The article states 'Crude oil prices saw a significant drop after Israeli Prime Minister Benjamin Netanyahu stated his willingness to strike military targets in Iran instead of oil or nuclear facilities.' A quick search confirms that oil prices did drop last week amid easing concerns about supply disruptions in the Middle East. While the article attributes the drop to Netanyahu's statement, the search results suggest a broader context of easing tensions, making the claim directionally correct."
+        },
+        "article_score": {
+            "user_article_score": 7,
+            "llm_score": 5,
+            "final_custom_score": 5.8
+        },
+        "sentiment": "Neutral"
     },
     {
         "_id": "6890648273f0740c34a932db",
@@ -1997,12 +2013,16 @@
             0.023387692868709564,
             0.025145644322037697
         ],
-        "llm_score": 5,
-        "sentiment_label": "neutral",
-        "user_verdict": "true",
-        "verdict": true,
-        "fact_check_explanation": "This is a placeholder fact-check explanation for demonstration.",
-        "user_article_score": 7
+        "fact_check": {
+            "verdict": false,
+            "fact_check_explanation": "The claim that \"Cryptocurrency markets were trading higher as of Wednesday, taking 96% of Bitcoin holders into profit\" is false. According to Coinglass, as of November 3, 2024, 79.58% of Bitcoin holders are in profit."
+        },
+        "article_score": {
+            "user_article_score": 7,
+            "llm_score": 5,
+            "final_custom_score": 5.8
+        },
+        "sentiment": "Neutral"
     },
     {
         "_id": "6890648273f0740c34a932dc",
@@ -2398,12 +2418,16 @@
             -0.028020242229104042,
             0.020378747954964638
         ],
-        "llm_score": 6,
-        "sentiment_label": "neutral",
-        "user_verdict": "true",
-        "verdict": true,
-        "fact_check_explanation": "This is a placeholder fact-check explanation for demonstration.",
-        "user_article_score": 7
+        "fact_check": {
+            "verdict": true,
+            "fact_check_explanation": "Multiple sources confirm that Elon Musk's America PAC is giving away $1 million daily to people in swing states who sign a petition supporting free speech and the right to bear arms."
+        },
+        "article_score": {
+            "user_article_score": 7,
+            "llm_score": 6,
+            "final_custom_score": 6.4
+        },
+        "sentiment": "Neutral"
     },
     {
         "_id": "6890648273f0740c34a932dd",
@@ -2799,12 +2823,16 @@
             -0.014357752166688442,
             -0.029954714700579643
         ],
-        "llm_score": 6,
-        "sentiment_label": "neutral",
-        "user_verdict": "true",
-        "verdict": true,
-        "fact_check_explanation": "This is a placeholder fact-check explanation for demonstration.",
-        "user_article_score": 7
+        "fact_check": {
+            "verdict": true,
+            "fact_check_explanation": "The U.S. Department of State is offering a reward of up to $10 million for information on foreign interference in the 2024 U.S. presidential election. A Google search confirms this, with multiple reputable news sources (Reuters, US Department of State) reporting the same information."
+        },
+        "article_score": {
+            "user_article_score": 7,
+            "llm_score": 6,
+            "final_custom_score": 6.4
+        },
+        "sentiment": "Negative"
     },
     {
         "_id": "6890648273f0740c34a932de",
@@ -3200,12 +3228,16 @@
             -0.0052900309674441814,
             0.03730502352118492
         ],
-        "llm_score": 5,
-        "sentiment_label": "neutral",
-        "user_verdict": "true",
-        "verdict": true,
-        "fact_check_explanation": "This is a placeholder fact-check explanation for demonstration.",
-        "user_article_score": 7
+        "fact_check": {
+            "verdict": true,
+            "fact_check_explanation": "The article states that Paul Krugman warned that Trump's tariff plan could set back economic progress by 90 years and potentially ignite global conflict. A Google search for \"Paul Krugman Trump tariff plan 90 years\" leads to articles and interviews where Krugman makes these claims, confirming the statement."
+        },
+        "article_score": {
+            "user_article_score": 7,
+            "llm_score": 5,
+            "final_custom_score": 5.8
+        },
+        "sentiment": "Negative"
     },
     {
         "_id": "6890648273f0740c34a932df",
@@ -3601,12 +3633,16 @@
             0.04051874577999115,
             0.06331086158752441
         ],
-        "llm_score": 6,
-        "sentiment_label": "neutral",
-        "user_verdict": "true",
-        "verdict": true,
-        "fact_check_explanation": "This is a placeholder fact-check explanation for demonstration.",
-        "user_article_score": 7
+        "fact_check": {
+            "verdict": true,
+            "fact_check_explanation": "The article claims Apple set a new sales record for its iPhone during the third quarter of 2024. According to Canalys, Apple's iPhone sales were narrowly edged out by Samsung Electronics Co. Ltd., with both tech giants capturing an 18% market share. A Google search for \"Apple iPhone sales Q3 2024\" shows multiple sources confirming Apple's strong iPhone sales performance in Q3 2024, although it was narrowly edged out by Samsung."
+        },
+        "article_score": {
+            "user_article_score": 7,
+            "llm_score": 6,
+            "final_custom_score": 6.4
+        },
+        "sentiment": "Neutral"
     },
     {
         "_id": "6890648273f0740c34a932e0",
@@ -4002,12 +4038,16 @@
             -0.02644370123744011,
             0.08367018401622772
         ],
-        "llm_score": 5,
-        "sentiment_label": "neutral",
-        "user_verdict": "true",
-        "verdict": true,
-        "fact_check_explanation": "This is a placeholder fact-check explanation for demonstration.",
-        "user_article_score": 7
+        "fact_check": {
+            "verdict": true,
+            "fact_check_explanation": "The article states that Donald Trump's rally in Detroit experienced a 17-minute audio malfunction. A search on Google confirms this claim, with multiple news outlets reporting on the audio issues during the rally. For example, Fox News reported 'Trump's Detroit rally delayed 17 minutes by audio issues, former president jokes he won't pay the bill'. Detroit News also reports on the audio issues."
+        },
+        "article_score": {
+            "user_article_score": 7,
+            "llm_score": 4,
+            "final_custom_score": 5.2
+        },
+        "sentiment": "Negative"
     },
     {
         "_id": "6890648273f0740c34a932e1",
@@ -4403,12 +4443,16 @@
             0.04260654002428055,
             0.00144358747638762
         ],
-        "llm_score": 5,
-        "sentiment_label": "neutral",
-        "user_verdict": "true",
-        "verdict": true,
-        "fact_check_explanation": "This is a placeholder fact-check explanation for demonstration.",
-        "user_article_score": 7
+        "fact_check": {
+            "verdict": true,
+            "fact_check_explanation": "The article states that Nvidia CEO Huang praised Musk for achieving something with xAI in 19 days that usually takes at least a year. A search for \"Nvidia CEO Huang xAI 19 days\" confirms that Huang made this statement, praising Musk's rapid progress with xAI."
+        },
+        "article_score": {
+            "user_article_score": 7,
+            "llm_score": 5,
+            "final_custom_score": 5.8
+        },
+        "sentiment": "Positive"
     },
     {
         "_id": "6890648273f0740c34a932e2",
@@ -4804,12 +4848,16 @@
             -0.06581874936819077,
             0.029942898079752922
         ],
-        "llm_score": 7,
-        "sentiment_label": "neutral",
-        "user_verdict": "true",
-        "verdict": true,
-        "fact_check_explanation": "This is a placeholder fact-check explanation for demonstration.",
-        "user_article_score": 7
+        "fact_check": {
+            "verdict": true,
+            "fact_check_explanation": "The article states that over the next two decades, there will be a massive transfer of over $84 trillion in assets. A Google search of \"great wealth transfer amount\" shows multiple reputable sources (Forbes, Bloomberg, etc.) claiming a similar figure, usually between $70-84 trillion. Thus, this claim is accurate."
+        },
+        "article_score": {
+            "user_article_score": 7,
+            "llm_score": 6,
+            "final_custom_score": 6.4
+        },
+        "sentiment": "Negative"
     },
     {
         "_id": "6890648273f0740c34a932e3",
@@ -5205,12 +5253,16 @@
             -0.03538784757256508,
             0.06213748827576637
         ],
-        "llm_score": 6,
-        "sentiment_label": "neutral",
-        "user_verdict": "true",
-        "verdict": true,
-        "fact_check_explanation": "This is a placeholder fact-check explanation for demonstration.",
-        "user_article_score": 7
+        "fact_check": {
+            "verdict": true,
+            "fact_check_explanation": "The article claims that the S&P 500 has seen significant gains, up 23% year-to-date following gains of 22% in 2023. A Google search confirms that the S&P 500 is up approximately 23% year-to-date (as of November 2024) and had gains of around 22% in 2023."
+        },
+        "article_score": {
+            "user_article_score": 7,
+            "llm_score": 5,
+            "final_custom_score": 5.8
+        },
+        "sentiment": "Negative"
     },
     {
         "_id": "6890648273f0740c34a932e4",
@@ -5606,12 +5658,16 @@
             -0.011934948153793812,
             0.06473573297262192
         ],
-        "llm_score": 4,
-        "sentiment_label": "neutral",
-        "user_verdict": "true",
-        "verdict": true,
-        "fact_check_explanation": "This is a placeholder fact-check explanation for demonstration.",
-        "user_article_score": 7
+        "fact_check": {
+            "verdict": true,
+            "fact_check_explanation": "The article states that a Benzinga poll found Warren Buffett to be the most likely person to be remembered as the most legendary investor in 100 years, with 61% of the vote. A Google search of \"Benzinga poll Warren Buffett legendary investor\" confirms that Benzinga conducted such a poll and that Buffett received 61% of the vote."
+        },
+        "article_score": {
+            "user_article_score": 7,
+            "llm_score": 5,
+            "final_custom_score": 5.8
+        },
+        "sentiment": "Positive"
     },
     {
         "_id": "6890648273f0740c34a932e5",
@@ -6007,11 +6063,15 @@
             -0.03477676957845688,
             0.10778330266475677
         ],
-        "llm_score": 6,
-        "sentiment_label": "neutral",
-        "user_verdict": "true",
-        "verdict": true,
-        "fact_check_explanation": "This is a placeholder fact-check explanation for demonstration.",
-        "user_article_score": 7
+        "fact_check": {
+            "verdict": true,
+            "fact_check_explanation": "According to the article, Apple unveiled the upgraded version of its iPad Mini, marking the first significant upgrade to the compact tablet since 2021. A quick search on Google confirms this claim with multiple reputable sources citing the release of the new iPad Mini as the first major update since 2021."
+        },
+        "article_score": {
+            "user_article_score": 7,
+            "llm_score": 6,
+            "final_custom_score": 6.4
+        },
+        "sentiment": "Neutral"
     }
 ]
