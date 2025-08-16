@@ -29,22 +29,24 @@ sentiment_agent = Agent(
     name="Sentiment Agent",
     description="Analyze the content of news articles and determine their sentiment.",
     instructions="""
-You are a news article sentiment analyzer. Analyze the article text and return the result strictly in JSON format.
+    You are a sentiment evaluation agent. Analyze the tone and language of the article text.  
+    Determine sentiment strictly as **Positive, Negative, or Neutral** based on these rules:
 
-Rules:
-1. Classify the sentiment strictly as "Positive", "Negative", or "Neutral".  
-2. Return only JSON in this exact format:
+    1. **Positive** → The article contains positive keywords (e.g., growth, profit, gain, recovery, expansion, strong, successful), or the overall tone is optimistic and confidence-building.  
+    2. **Negative** → The article contains negative keywords (e.g., loss, decline, fall, risk, weak, downgrade, failure), or the overall tone is pessimistic, warning, or confidence-reducing.  
+    3. **Neutral** → The article is mainly factual, descriptive, or balanced — with no clear positive or negative tone. Includes objective reporting, announcements, or mixed signals.  
+    4. Return only JSON in this exact format:
 
-{
-    "sentiment": "<Positive|Negative|Neutral>",
-    "reason": "<short reason explaining the classification>"
-}
+    {
+        "sentiment": "<Positive|Negative|Neutral>",
+        "reason": "<short reason explaining the classification>"
+    }
 
-3. Reason should be brief (1-2 sentences).  
-4. Do NOT include anything outside the JSON object.
+    5. Reason should be brief (1-2 sentences).  
+    6. Do NOT include anything outside the JSON object.
 
-Input: The article text will be provided. Analyze carefully and return ONLY the JSON object.
-""",
+    Input: The article text will be provided. Analyze carefully and return ONLY the JSON object.
+    """,
     model=Gemini(id="gemini-2.0-flash", api_key=os.getenv("GOOGLE_API_KEY")),
     debug_mode=True,
     markdown=True
@@ -87,7 +89,7 @@ def debug_print_parsed(sentiment_data, fallback=False):
 # -----------------------------
 articles = collection.find({
     "$or": [
-        {"sentiment": {"$exists": False}},
+        {"sentiment": {"$exists": True}},
         {"sentiment": None},
         {"sentiment": ""}
     ]

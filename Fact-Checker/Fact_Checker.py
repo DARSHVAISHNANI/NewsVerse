@@ -73,7 +73,7 @@ def run_fact_checker():
 
             results.append({
                 "article_id": article_id,
-                "llm_verdict": fact_result.get("verdict"),
+                "llm_verdict": fact_result.get("llm_verdict"),
                 "fact_check_explanation": fact_result.get("fact_check_explanation")
             })
 

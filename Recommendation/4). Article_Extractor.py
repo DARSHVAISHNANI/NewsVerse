@@ -18,8 +18,6 @@ client = MongoClient(
 )
 user_analysis_col = client["UserDB"]["UserPreferenceAnalysis"]
 news_col = client["NewsVerseDB"]["NewsVerseCo"]
-recommendations_col = client["UserDB"]["UserArticleRecommendations"]
-
 # Embedding Model
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
