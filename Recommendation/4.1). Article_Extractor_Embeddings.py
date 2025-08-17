@@ -18,6 +18,8 @@ client = MongoClient(
 )
 user_analysis_col = client["UserDB"]["UserPreferenceAnalysisBasedNER"]
 news_col = client["NewsVerseDB"]["NewsVerseCo"]
+# recommendations_col = client["RecommendationHistory"]["RecommendedArticle"]
+
 # Embedding Model
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
@@ -36,45 +38,39 @@ article_match_agent = Agent(
     show_tool_calls=True
 )
 
-def suggest_article_for_user(user_id, detailed_summary, top_n=10):
-    """Suggest best article for a single user."""
-    # Embed user summary
+def suggest_articles_for_user(user_id, detailed_summary, top_n=10):
+    """Suggest top N articles for a user using embeddings only."""
+    
+    # 1. Create embedding for user summary
     summary_embedding = model.encode(detailed_summary)
 
-    # Fetch articles with embeddings
-    articles = list(news_col.find({"embedding": {"$exists": True}}, {"_id": 1, "title": 1, "body": 1, "embedding": 1}))
+    # 2. Fetch all articles with stored embeddings
+    articles = list(news_col.find(
+        {"embedding": {"$exists": True}},
+        {"_id": 1, "title": 1, "body": 1, "embedding": 1}
+    ))
 
     if not articles:
-        return None
+        return []
 
-    # Compute similarity
+    # 3. Compute cosine similarity
     for article in articles:
-        article["similarity"] = float(
-            np.dot(summary_embedding, article["embedding"]) /
-            (np.linalg.norm(summary_embedding) * np.linalg.norm(article["embedding"]))
+        article_embedding = np.array(article["embedding"], dtype=np.float32)
+        similarity = float(
+            np.dot(summary_embedding, article_embedding) /
+            (np.linalg.norm(summary_embedding) * np.linalg.norm(article_embedding))
         )
+        article["similarity"] = similarity
 
-    # Sort and shortlist top N
+    # 4. Sort & select top N
     top_articles = sorted(articles, key=lambda x: x["similarity"], reverse=True)[:top_n]
 
-    # Prepare JSON for AI
-    articles_json = json.dumps(
-        [{"_id": str(a["_id"]), "title": a["title"], "body": a["body"]} for a in top_articles],
-        ensure_ascii=False
-    )
+    # 5. Return results (article ID, title, similarity)
+    return [
+        {"_id": str(a["_id"]), "title": a["title"], "similarity": round(a["similarity"], 4)}
+        for a in top_articles
+    ]
 
-    # Ask AI agent
-    prompt = f"""
-    User summary:
-    {detailed_summary}
-
-    Shortlisted Articles:
-    {articles_json}
-
-    Please return ONLY the _id of the best matching article.
-    """
-    result = article_match_agent.run(prompt)
-    return result.content.strip()
 
 def recommend_for_all_users():
     """Loop through all users and recommend articles."""
@@ -86,19 +82,17 @@ def recommend_for_all_users():
         detailed_summary = user["detailed_summary"]
 
         print(f"🔍 Processing user: {user_id}")
-        article_id = suggest_article_for_user(user_id, detailed_summary)
+        top_articles = suggest_articles_for_user(user_id, detailed_summary, top_n=10)
 
-        if article_id:
-            print(f"✅ Recommended article for {user_id}: {article_id}")
-            all_recommendations.append({"user_id": user_id, "article_id": article_id})
+        if top_articles:
+            print(f"✅ Top {len(top_articles)} recommendations for {user_id}:")
+            for art in top_articles:
+                print(f"   {art['_id']} | {art['title']} | score={art['similarity']}")
+            all_recommendations.append({"user_id": user_id, "articles": top_articles})
         else:
             print(f"⚠ No recommendation for {user_id}")
 
-    # Save recommendations in DB
-    # if all_recommendations:
-    #     recommendations_col.delete_many({})  # Optional: clear old results
-    #     recommendations_col.insert_many(all_recommendations)
-    #     print(f"\n💾 Saved {len(all_recommendations)} recommendations to DB.")
+    return all_recommendations
 
 if __name__ == "__main__":
     recommend_for_all_users()
