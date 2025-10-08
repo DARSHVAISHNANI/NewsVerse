@@ -1,0 +1,36 @@
+import certifi
+from pymongo import MongoClient
+
+# Import our settings from the config file
+from Embedding_Creation import config
+
+def connectToDb():
+    """Connects to MongoDB and returns the collection object."""
+    try:
+        client = MongoClient(config.MONGO_URI, tlsCAFile=certifi.where())
+        db = client[config.DB_NAME]
+        collection = db[config.COLLECTION_NAME]
+        print(f"✅ Connected to DB: {db.name}, collection: {collection.name}")
+        return collection
+    except Exception as e:
+        print(f"❌ Failed to connect to MongoDB: {e}")
+        return None
+
+def fetchArticlesWithoutEmbeddings(collection):
+    """Fetches all articles from the collection that do not have an embedding."""
+    if collection is None:
+        return []
+
+    articles = list(collection.find({"embedding": {"$exists": False}}))
+    print(f"📦 Found {len(articles)} articles without embeddings.")
+    return articles
+
+def updateArticleEmbedding(collection, article_id, embedding):
+    """Updates a single article with the new embedding vector."""
+    if collection is None:
+        return
+
+    collection.update_one(
+        {"_id": article_id},
+        {"$set": {"embedding": embedding}}
+    )
