@@ -50,5 +50,5 @@ def updateUserNer(user_collection, user_mongo_id, ner_data):
 
     user_collection.update_one(
         {"_id": user_mongo_id},
-        {"$set": {"NER": ner_data}}
+        {"$set": {"ner_data": ner_data}}
     )

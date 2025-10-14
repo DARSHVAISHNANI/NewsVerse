@@ -14,14 +14,20 @@ def get_factual_summary(content):
         try:
             summarization_agent = get_summarization_agent()
             response = summarization_agent.run(content)
-            cleaned_text = CleanJsonOutput(response)
+            
+            # --- FIX: Extract content from the agno RunOutput object ---
+            response_content = response.content if hasattr(response, 'content') else str(response)
+            
+            cleaned_text = CleanJsonOutput(response_content)
             summary_data = json.loads(cleaned_text)
             return summary_data.get("summary", "")
         except ResourceExhausted:
             print("🚨 Gemini API rate limit exceeded. Switching to Groq for factual summary...")
             api_manager.switch_to_groq()
         except Exception as e:
-            print(f"   ✗ Factual Summary: Failed ({e})")
+            # Added type check for better logging
+            error_msg = f"'{type(response).__name__}' object has no attribute 'strip'" if 'strip' in str(e) and 'response' in locals() else e
+            print(f"   ✗ Factual Summary: Failed ({error_msg})")
             return ""
     print("❌ Failed to get factual summary after exhausting all models.")
     return ""
@@ -34,7 +40,11 @@ def get_story_summary(content):
         try:
             story_agent = get_story_agent()
             story_response = story_agent.run(content)
-            story_cleaned = CleanJsonOutput(story_response)
+            
+            # --- FIX: Extract content from the agno RunOutput object ---
+            story_response_content = story_response.content if hasattr(story_response, 'content') else str(story_response)
+            
+            story_cleaned = CleanJsonOutput(story_response_content)
             story_data = json.loads(story_cleaned)
             return story_data.get("story_summary", "")
         except ResourceExhausted:
@@ -42,7 +52,9 @@ def get_story_summary(content):
             print("🚨 Gemini API rate limit exceeded. Switching to Groq for story summary...")
             api_manager.switch_to_groq()
         except Exception as e:
-            print(f"   ✗ Story Summary: Failed ({e})")
+            # Added type check for better logging
+            error_msg = f"'{type(story_response).__name__}' object has no attribute 'strip'" if 'strip' in str(e) and 'story_response' in locals() else e
+            print(f"   ✗ Story Summary: Failed ({error_msg})")
             return ""
     print("❌ Failed to get story summary after exhausting all models.")
     return ""

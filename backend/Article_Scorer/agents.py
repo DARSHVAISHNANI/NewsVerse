@@ -28,6 +28,6 @@ def get_scoring_agent():
 
     if api_manager.get_current_model_name() == 'groq':
         # Use a Groq model instance for parsing
-        agent_params['parse_model'] = Groq(id="llama3-8b-8192", api_key=api_manager.groq_keys[0])
+        agent_params['parser_model'] = Groq(id="openai/gpt-oss-120b", api_key=api_manager.groq_keys[0])
 
     return Agent(**agent_params)

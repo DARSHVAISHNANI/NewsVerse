@@ -17,17 +17,26 @@ def get_fact_check_from_llm(article_text):
             # Get a fresh agent instance with the current model
             fact_checker_agent = get_fact_checker_agent()
             response = fact_checker_agent.run(article_text)
-            return parseJsonOutput(response)
-        
+
+            # --- THIS IS THE FIX ---
+            # Extract the 'content' attribute from the RunOutput object
+            if hasattr(response, 'content'):
+                response_content = response.content
+            else:
+                # Fallback for other cases
+                response_content = str(response)
+
+            return parseJsonOutput(response_content)
+
         except ResourceExhausted:
             print("🚨 Gemini API rate limit exceeded. Switching to Groq for fact-checking...")
             api_manager.switch_to_groq()
             # The loop will automatically retry with the new Groq model
-            
+
         except Exception as e:
             print(f"An unexpected error occurred during fact-checking: {e}")
             return None
-            
+
     print("❌ Failed to get a fact-check result after exhausting all available models.")
     return None
 

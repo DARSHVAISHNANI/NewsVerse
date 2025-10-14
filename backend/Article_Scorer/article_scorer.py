@@ -1,4 +1,4 @@
-# backend/Article_Scorer/run_scoring.py
+# backend/Article_Scorer/article_scorer.py
 
 from google.api_core.exceptions import ResourceExhausted
 from Article_Scorer import db_manager
@@ -11,23 +11,49 @@ def get_llm_score(article_text):
     Gets a score from the LLM, handling API rate limits by falling back to Groq.
     """
     max_retries = 2 # Attempt 1: Gemini, Attempt 2: Groq
+    
+    # Store the raw response to print if parsing fails
+    last_response_content = None 
+    
     for attempt in range(max_retries):
         try:
             # Get a fresh agent instance with the current model
             scoring_agent = get_scoring_agent()
             response = scoring_agent.run(article_text)
-            return parseScoreJson(response)
-        
+            
+            # --- AGNO Response Extraction ---
+            # Extract the 'content' attribute from the RunOutput object
+            if hasattr(response, 'content'):
+                response_content = response.content
+            else:
+                response_content = str(response)
+                
+            last_response_content = response_content # Store the content
+            
+            # Attempt to parse
+            parsed_data = parseScoreJson(response_content)
+            
+            if parsed_data:
+                return parsed_data
+            else:
+                # If parsing fails but no exception, it returns None.
+                raise ValueError("Parsing returned None.")
+
         except ResourceExhausted:
             print("🚨 Gemini API rate limit exceeded. Switching to Groq for scoring...")
             api_manager.switch_to_groq()
             # The loop will automatically retry with the new Groq model
-            
+
         except Exception as e:
+            # Print generic errors during run/parse
             print(f"An unexpected error occurred while scoring: {e}")
+            if last_response_content:
+                print(f"DEBUG: Raw response content on failure:\n---\n{last_response_content}\n---")
             # For other errors, we break the loop to avoid repeated failures
-            return None
-    
+            if attempt == max_retries - 1:
+                break # Break only on the final attempt
+            # The loop continues to the next attempt/model otherwise
+            
     print("❌ Failed to get a score after exhausting all available models.")
     return None
 

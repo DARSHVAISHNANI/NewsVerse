@@ -1,2 +1,1 @@
-# NewsVerse
-News Universe
+# Welocme to Newsverse

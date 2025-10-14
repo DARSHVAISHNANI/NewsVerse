@@ -10,7 +10,7 @@ from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 
 # Import our settings from the config file
-from Scraping_Crawling import config
+import config
 
 # =============================================================================
 # MONGODB FUNCTIONS

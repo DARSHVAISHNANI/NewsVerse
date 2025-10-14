@@ -22,7 +22,7 @@ def get_analysis_agent():
         "add_history_to_context": False,
         "markdown": True
     }
-    # No parse_model needed here as the output is a paragraph, not structured JSON.
+    # No parser_model needed here as the output is a paragraph, not structured JSON.
     return Agent(**agent_params)
 
 def get_article_match_agent():
@@ -44,6 +44,6 @@ def get_article_match_agent():
 
     if api_manager.get_current_model_name() == 'groq':
         # Use a Groq model instance for parsing
-        agent_params['parse_model'] = Groq(id="llama3-8b-8192", api_key=api_manager.groq_keys[0])
+        agent_params['parser_model'] = Groq(id="openai/gpt-oss-120b", api_key=api_manager.groq_keys[0])
 
     return Agent(**agent_params)

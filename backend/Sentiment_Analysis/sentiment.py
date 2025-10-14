@@ -40,11 +40,16 @@ def main():
         # --- Integration of API fallback logic ---
         max_retries = 2  # Attempt 1: Gemini, Attempt 2: Groq
         for attempt in range(max_retries):
+            response = None # Initialize response for logging outside the try block
             try:
                 # Get a fresh agent instance with the current model
                 sentiment_agent = get_sentiment_agent()
-                response = sentiment_agent.generate_response(content)
-                cleaned_text = CleanJsonOutput(response)
+                response = sentiment_agent.run(content)
+                
+                # --- FIX: Extract content from the agno RunOutput object ---
+                response_content = response.content if hasattr(response, 'content') else str(response)
+
+                cleaned_text = CleanJsonOutput(response_content)
                 sentiment_data = json.loads(cleaned_text)
                 print(f"   ✓ Sentiment: Generated")
                 break # If successful, exit the retry loop
@@ -53,7 +58,9 @@ def main():
                 api_manager.switch_to_groq()
                 # The loop will automatically retry with the new Groq model
             except Exception as e:
-                print(f"   ✗ Sentiment: Failed ({e})")
+                # Added type check for better logging
+                error_msg = f"'{type(response).__name__}' object has no attribute 'strip'" if 'strip' in str(e) and response is not None else e
+                print(f"   ✗ Sentiment: Failed ({error_msg})")
                 break # For other errors, exit the loop
         # --- End of integration ---
         

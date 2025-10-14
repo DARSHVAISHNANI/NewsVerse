@@ -11,7 +11,7 @@ def get_summarization_agent():
     # This agent always uses Groq for summarization tasks.
     # It gets its key from the central api_manager.
     groq_api_key = api_manager.groq_keys[0] if api_manager.groq_keys else None
-    model = Groq(id="llama3-8b-8192", api_key=groq_api_key)
+    model = Groq(id="openai/gpt-oss-120b", api_key=groq_api_key)
     
     return Agent(
         name="Summarization Agent",
@@ -29,7 +29,7 @@ def get_summarization_agent():
         model=model,
         debug_mode=True,
         # Use a Groq model instance for parsing to ensure consistent JSON output
-        parse_model=Groq(id="llama3-8b-8192", api_key=groq_api_key)
+        parser_model=Groq(id="openai/gpt-oss-120b", api_key=groq_api_key)
     )
 
 
@@ -38,7 +38,7 @@ def get_story_agent():
     Creates and returns a StoryAgent, always using Groq.
     """
     groq_api_key = api_manager.groq_keys[0] if api_manager.groq_keys else None
-    model = Groq(id="llama3-8b-8192", api_key=groq_api_key)
+    model = Groq(id="openai/gpt-oss-120b", api_key=groq_api_key)
     
     return Agent(
         name="Storytelling Summarizer",
@@ -60,5 +60,5 @@ def get_story_agent():
         model=model,
         debug_mode=True,
         # Use a Groq model instance for parsing to ensure consistent JSON output
-        parse_model=Groq(id="llama3-8b-8192", api_key=groq_api_key)
+        parser_model=Groq(id="openai/gpt-oss-120b", api_key=groq_api_key)
     )

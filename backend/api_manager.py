@@ -27,7 +27,7 @@ class ApiManager:
             return Gemini(id="gemini-2.0-flash", api_key=self.gemini_keys[0])
         else: # Fallback to groq
              # Corrected to a valid llama3 model
-            return Groq(id="llama3-8b-8192", api_key=self.groq_keys[0])
+            return Groq(id="openai/gpt-oss-120b", api_key=self.groq_keys[0])
 
     def switch_to_groq(self):
         """

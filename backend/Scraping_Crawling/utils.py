@@ -5,7 +5,7 @@ import re
 from typing import Dict
 
 # We need to import our config file to get user agents and headers
-from Scraping_Crawling import config
+import config
 
 # =============================================================================
 # UTILITY FUNCTIONS

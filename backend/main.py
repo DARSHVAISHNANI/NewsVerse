@@ -28,6 +28,7 @@ from Article_Scorer.article_scorer import main as runArticleScorer
 from Whatsapp_Messaging.whatsapp_serice import formatMessage, sendWhatsapp
 from Whatsapp_Messaging.scheduler_tasks import send_single_user_notification
 from preprocessing_pipeline import main as run_preprocessing_pipeline
+from Name_Entity_Recognition.NER import runNerForUsers # Import the NER function
 
 
 # Load environment variables from .env file

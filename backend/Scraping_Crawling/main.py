@@ -6,10 +6,10 @@ import json
 import requests
 
 # Import from our modules
-from Scraping_Crawling import config
-from Scraping_Crawling import db_manager
-from Scraping_Crawling import scraper
-from Scraping_Crawling.utils import IsValidArticle
+import config
+import db_manager
+import scraper
+from utils import IsValidArticle
 import asyncio, os
 
 async def main():

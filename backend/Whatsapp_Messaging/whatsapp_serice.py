@@ -41,9 +41,15 @@ def sendWhatsapp(user_number: str, message: str):
         print("  - ⚠️  Cannot send message: Twilio client is not available.")
         return
 
+    # --- FIX: Ensure the FROM number has the correct 'whatsapp:' prefix ---
+    from_number = config.FROM_WHATSAPP
+    if not from_number.lower().startswith("whatsapp:"):
+        from_number = f"whatsapp:{from_number}"
+    # --- END FIX ---
+
     try:
         twilio_client.messages.create(
-            from_=config.FROM_WHATSAPP,
+            from_=from_number, # Use the guaranteed correctly prefixed FROM number
             to=f"whatsapp:{user_number}",
             body=message
         )
