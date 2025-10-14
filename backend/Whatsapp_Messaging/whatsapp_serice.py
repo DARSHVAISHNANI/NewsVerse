@@ -2,14 +2,19 @@
 
 from twilio.rest import Client
 from Whatsapp_Messaging import config
+import logging # New Import
+
+# --- Logging Setup ---
+logger = logging.getLogger("WhatsappService")
+logger.setLevel(logging.INFO)
 
 # Initialize the Twilio client once when the module is imported
 try:
     twilio_client = Client(config.ACCOUNT_SID, config.AUTH_TOKEN)
-    print("✅ Twilio client initialized successfully.")
+    logger.info("Twilio client initialized successfully.") # Replaced print
 except Exception as e:
     twilio_client = None
-    print(f"❌ Failed to initialize Twilio client: {e}")
+    logger.error(f"Failed to initialize Twilio client: {e}", exc_info=True) # Replaced print
 
 def formatMessage(news_article: dict) -> str:
     """Formats a news article dictionary into a readable WhatsApp message."""
@@ -38,7 +43,7 @@ def formatMessage(news_article: dict) -> str:
 def sendWhatsapp(user_number: str, message: str):
     """Sends a message to a given user's WhatsApp number."""
     if not twilio_client:
-        print("  - ⚠️  Cannot send message: Twilio client is not available.")
+        logger.warning(f"Cannot send message to {user_number}: Twilio client is not available.") # Replaced print
         return
 
     # --- FIX: Ensure the FROM number has the correct 'whatsapp:' prefix ---
@@ -53,5 +58,6 @@ def sendWhatsapp(user_number: str, message: str):
             to=f"whatsapp:{user_number}",
             body=message
         )
+        logger.info(f"Successfully sent WhatsApp message to {user_number}.") # Added success logging
     except Exception as e:
-        print(f"  - ❌ Error sending message to {user_number}: {e}")
+        logger.error(f"Error sending message to {user_number}: {e}", exc_info=True) # Replaced print

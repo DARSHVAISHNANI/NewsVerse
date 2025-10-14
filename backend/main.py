@@ -1,5 +1,3 @@
-# main.py - UPDATED WITH PERSONALIZED RECOMMENDATIONS PAGE
-
 import os
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, Form, BackgroundTasks
@@ -12,7 +10,7 @@ from typing import Optional, List
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi.middleware.cors import CORSMiddleware
 from bson import ObjectId
-
+import logging 
 import sys
 import os
 
@@ -28,11 +26,20 @@ from Article_Scorer.article_scorer import main as runArticleScorer
 from Whatsapp_Messaging.whatsapp_serice import formatMessage, sendWhatsapp
 from Whatsapp_Messaging.scheduler_tasks import send_single_user_notification
 from preprocessing_pipeline import main as run_preprocessing_pipeline
-from Name_Entity_Recognition.NER import runNerForUsers # Import the NER function
+from Name_Entity_Recognition.NER import runNerForUsers
 
 
 # Load environment variables from .env file
 load_dotenv()
+
+# --- Logging Setup ---
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    stream=sys.stdout
+)
+logger = logging.getLogger("NewsverseBackend")
+
 
 # --- Configuration ---
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8080") 
@@ -43,18 +50,20 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 
 # --- MongoDB Setup ---
-client = MongoClient(MONGO_URI)
-db = client["TestANewsVerseDB"]
-user_collection = db["UserDetails"]
-articles_collection = db["ArticlesCollection"]
-# NEW: Add a connection to the recommendations collection
-recommended_articles_collection = db["UserRecommendedArticles"]
+try:
+    client = MongoClient(MONGO_URI)
+    db = client["TestANewsVerseDB"]
+    user_collection = db["UserDetails"]
+    articles_collection = db["ArticlesCollection"]
+    recommended_articles_collection = db["UserRecommendedArticles"]
+    logger.info("Successfully connected to MongoDB.")
+except Exception as e:
+    logger.critical(f"FATAL: Could not connect to MongoDB. Check MONGO_URI. Error: {e}")
+
+
 # --- Scheduler Setup ---
 scheduler = BackgroundScheduler({'apscheduler.timezone': 'Asia/Kolkata'})
 scheduler.start()
-print("✅ Successfully connected to MongoDB.")
-
-
 
 
 # --- Pydantic Models ---
@@ -87,7 +96,6 @@ class Article(BaseModel):
     url: Optional[str] = "#"
     user_has_rated: bool = False
     user_has_liked: bool = False
-    # Use default_factory to ensure these are never None
     summarization: Summarization = Field(default_factory=dict)
     fact_check: FactCheck = Field(default_factory=dict)
     sentiment: Optional[str] = "N/A"
@@ -101,7 +109,7 @@ class Article(BaseModel):
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_URL, "http://localhost:8080"], # Add all frontend ports
+    allow_origins=[FRONTEND_URL, "http://localhost:8080"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -124,6 +132,7 @@ oauth.register(
 
 @app.get('/login/google')
 async def login_via_google(request: Request):
+    logger.info("Initiating Google login redirect.")
     redirect_uri = request.url_for('auth_via_google')
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
@@ -143,14 +152,14 @@ async def auth_via_google(request: Request):
                 "email": existing_user['email'],
                 "picture": existing_user.get('picture'),
             }
-            # ALWAYS redirect back to the frontend homapage
+            logger.info(f"Existing user logged in: {user_info['email']}")
             return RedirectResponse(url=f"{FRONTEND_URL}/") 
         else:
             request.session['new_user_google_info'] = dict(user_info)
-            # ALWAYS redirect back to the frontend
+            logger.info(f"New user redirected to onboarding: {user_info['email']}")
             return RedirectResponse(url=f"{FRONTEND_URL}/onboarding")
     except Exception as e:
-        print(f"Error during authentication: {e}")
+        logger.error(f"Error during authentication: {e}", exc_info=True)
         return RedirectResponse(url=f"{FRONTEND_URL}/login?error=auth_failed")
 
 @app.post("/api/complete-onboarding")
@@ -161,50 +170,45 @@ async def complete_onboarding_api(
 ):
     google_info = request.session.get('new_user_google_info')
     if not google_info:
+        logger.warning("Attempted onboarding without an active Google session.")
         return JSONResponse(content={"error": "Authentication session not found"}, status_code=401)
 
     user_email = google_info['email']
 
-    # THE FIX: Check if the user already exists in the database.
-    existing_user = user_collection.find_one({"email": user_email})
+    try:
+        existing_user = user_collection.find_one({"email": user_email})
 
-    # Prepare complete user data with defaults for all fields.
-    user_data = {
-        "email": user_email,
-        "name": google_info['name'],
-        "picture": google_info.get('picture'),
-        "phone_number": phone_number,
-        "preferred_time": preferred_time,
-        "rated_articles": [], # Default empty list
-        "title_id_list": [],  # Default empty list
-        "title_list": [],     # Default empty list
-    }
+        user_data = {
+            "email": user_email,
+            "name": google_info['name'],
+            "picture": google_info.get('picture'),
+            "phone_number": phone_number,
+            "preferred_time": preferred_time,
+            "rated_articles": [],
+            "title_id_list": [],
+            "title_list": [],
+        }
 
-    if existing_user:
-        # If user exists, UPDATE them with the new details (idempotent).
-        user_collection.update_one(
-            {"email": user_email},
-            {"$set": {
-                "phone_number": phone_number,
-                "preferred_time": preferred_time
-            }}
-        )
-        print(f"Updated existing user: {user_email}")
-    else:
-        # If user does not exist, INSERT them.
-        try:
-            # We use the Pydantic model to validate before inserting
+        if existing_user:
+            user_collection.update_one(
+                {"email": user_email},
+                {"$set": {
+                    "phone_number": phone_number,
+                    "preferred_time": preferred_time
+                }}
+            )
+            logger.info(f"Updated existing user: {user_email}")
+        else:
             user_model = User(**user_data)
             user_collection.insert_one(user_model.model_dump(by_alias=True))
-            print(f"Created new user: {user_email}")
-        except Exception as e:
-            print(f"Error creating user: {e}")
-            return JSONResponse(content={"error": "Error creating account"}, status_code=500)
+            logger.info(f"Created new user: {user_email}")
+            
+    except Exception as e:
+        logger.error(f"Error creating user {user_email}: {e}", exc_info=True)
+        return JSONResponse(content={"error": "Error creating account"}, status_code=500)
 
-    # Clean up the temporary session data
     request.session.pop('new_user_google_info', None)
     
-    # Create the final, persistent user session
     user_session_data = {
         "name": user_data['name'],
         "email": user_data['email'],
@@ -212,12 +216,14 @@ async def complete_onboarding_api(
     }
     request.session['user'] = user_session_data
     
-    # Always return the user object on success
     return JSONResponse(content={"user": user_session_data})
 
 @app.post("/api/logout")
 async def logout_api(request: Request):
-    request.session.pop('user', None)
+    user_session = request.session.get('user')
+    if user_session:
+        logger.info(f"User logged out: {user_session.get('email')}")
+        request.session.pop('user', None)
     return JSONResponse(content={"message": "Logout successful"})
 
 @app.delete("/api/delete-account")
@@ -231,21 +237,24 @@ async def delete_account_api(request: Request):
 
     user_email = user_session.get('email')
     
-    # Perform the deletion from the UserDetails collection
-    result = user_collection.delete_one({"email": user_email})
+    try:
+        result = user_collection.delete_one({"email": user_email})
 
-    if result.deleted_count == 0:
-        return JSONResponse(content={"error": "User not found"}, status_code=404)
+        if result.deleted_count == 0:
+            logger.warning(f"Attempted to delete non-existent account: {user_email}")
+            return JSONResponse(content={"error": "User not found"}, status_code=404)
 
-    # Clear the user's session to log them out
-    request.session.pop('user', None)
-    
-    return JSONResponse(content={"message": "Account deleted successfully"})
+        # Clear the user's session to log them out
+        request.session.pop('user', None)
+        logger.info(f"Account deleted successfully: {user_email}")
+        return JSONResponse(content={"message": "Account deleted successfully"})
+    except Exception as e:
+        logger.error(f"Error deleting account for {user_email}: {e}", exc_info=True)
+        return JSONResponse(content={"error": "Server error during deletion"}, status_code=500)
 
 
 # --- ALL API ENDPOINTS FOR REACT ---
 
-# ADD THIS NEW ENDPOINT
 @app.get("/api/random-articles", response_model=List[Article])
 async def get_random_articles_api(request: Request):
     """
@@ -258,7 +267,6 @@ async def get_random_articles_api(request: Request):
     
     articles = list(random_articles_cursor)
 
-    # We still need to check the user's like/rate status for these random articles
     user = request.session.get('user')
     if not user:
         return articles
@@ -301,7 +309,7 @@ async def get_articles_api(request: Request):
 
     # Fetch articles directly from your database
     articles_cursor = articles_collection.find().limit(
-        20)  # Fetch more articles for a real app
+        20)
     articles = list(articles_cursor)
 
     if not user:
@@ -324,13 +332,8 @@ async def get_articles_api(request: Request):
         article_data["_id"] = article_id
         article_data["user_has_rated"] = article_id in rated_articles
         article_data["user_has_liked"] = article_id in liked_articles
-
-        # --- ADD THIS BLOCK ---
-        # Ensure nested data is correctly formatted or defaults are provided
         article_data["summarization"] = article.get("summarization", {})
         article_data["fact_check"] = article.get("fact_check", {})
-        # --- END BLOCK ---
-
         articles_with_user_data.append(article_data)
 
     return articles_with_user_data
@@ -353,8 +356,6 @@ async def get_recommendations_api(request: Request):
 
     recommended_ids_str = [rec["_id"] for rec in user_recs_doc["articles"]]
 
-    # --- THIS IS THE FIX ---
-    # We removed the ObjectId() conversion and now query with the strings directly.
     recommended_articles_cursor = articles_collection.find({
         "_id": {"$in": recommended_ids_str}
     })
@@ -374,7 +375,6 @@ async def toggle_like_article_api(
 ):
     user = request.session.get('user')
     if not user:
-        # Respond with a JSON error, which the frontend can handle
         return JSONResponse(content={"error": "Not authenticated"}, status_code=401)
 
     user_details = user_collection.find_one({"email": user['email']})
@@ -397,7 +397,6 @@ async def toggle_like_article_api(
         )
         message = "Article liked"
 
-    # Respond with a JSON success message for the frontend
     return JSONResponse(content={"message": message, "liked": not is_currently_liked})
 
 @app.get("/api/user-preference")
@@ -454,31 +453,34 @@ async def rate_article_api(
     if not user_session:
         return JSONResponse(content={"error": "Not authenticated"}, status_code=401)
 
-    user_details = user_collection.find_one({"email": user_session['email']})
-    if user_details and article_id in user_details.get("rated_articles", []):
-        return JSONResponse(content={"error": "Article already rated"}, status_code=400)
+    user_email = user_session['email']
+    
+    try:
+        user_details = user_collection.find_one({"email": user_email})
+        if user_details and article_id in user_details.get("rated_articles", []):
+            logger.warning(f"User {user_email} attempted to re-rate article {article_id}.")
+            return JSONResponse(content={"error": "Article already rated"}, status_code=400)
 
-    # --- THIS IS THE FIX ---
-    # The ObjectId() conversion is removed from the query below.
-    # Note: The original code used a different logic here, this reflects the code provided in the prompt.
-    articles_collection.update_one(
-        {"_id": article_id},  # Use the string ID directly
-        {
-            # Note: This logic might differ from your last version.
-            # Sticking to the prompt's provided code structure.
-            # Example logic
-            "$set": {"article_score.user_article_score": rating},
-            "$inc": {"article_score.total_ratings": 1},
-            "$push": {"rated_by": user_session['email']}
-        }
-    )
+        articles_collection.update_one(
+            {"_id": ObjectId(article_id)}, 
+            {
+                "$set": {"article_score.user_article_score": rating},
+                "$inc": {"article_score.total_ratings": 1},
+                "$push": {"rated_by": user_email}
+            }
+        )
 
-    user_collection.update_one(
-        {"email": user_session['email']},
-        {"$push": {"rated_articles": article_id}}
-    )
+        user_collection.update_one(
+            {"email": user_email},
+            {"$push": {"rated_articles": article_id}}
+        )
+        logger.info(f"User {user_email} rated article {article_id} with score {rating}.")
 
-    return JSONResponse(content={"message": "Rating submitted successfully!"})
+        return JSONResponse(content={"message": "Rating submitted successfully!"})
+
+    except Exception as e:
+        logger.error(f"Database error submitting rating for article {article_id} by {user_email}: {e}", exc_info=True)
+        return JSONResponse(content={"error": "Server error submitting rating"}, status_code=500)
 
 @app.post("/api/schedule-notifications")
 async def schedule_notifications_api(request: Request, background_tasks: BackgroundTasks):
@@ -489,9 +491,11 @@ async def schedule_notifications_api(request: Request, background_tasks: Backgro
     if not user_session:
         return JSONResponse(content={"error": "Not authenticated"}, status_code=401)
 
-    user_details = user_collection.find_one({"email": user_session['email']})
+    user_email = user_session['email']
+    user_details = user_collection.find_one({"email": user_email})
 
     if not user_details or not user_details.get("preferred_time") or not user_details.get("phone_number"):
+        logger.warning(f"Scheduling failed for {user_email}: missing time or phone.")
         return JSONResponse(
             content={
                 "error": "Please set a valid phone number and preferred time before scheduling."},
@@ -500,37 +504,43 @@ async def schedule_notifications_api(request: Request, background_tasks: Backgro
 
     # Immediately run the pipeline in the background to generate the first set of recommendations
     background_tasks.add_task(run_preprocessing_pipeline)
-    print("🚀 Triggered immediate preprocessing pipeline in the background for user.")
+    logger.info("Triggered immediate preprocessing pipeline in the background for user.")
 
     preferred_time_str = user_details["preferred_time"]
     hour, minute = map(int, preferred_time_str.split(':'))
-    user_email = user_details["email"]
+    
+    try:
+        notification_job_id = f"user_notification_{user_email}"
+        scheduler.add_job(
+            send_single_user_notification,
+            trigger='cron',
+            hour=hour,
+            minute=minute,
+            args=[user_email],
+            id=notification_job_id,
+            replace_existing=True
+        )
+        logger.info(f"Scheduled daily news for {user_email} at {preferred_time_str}.")
+    except Exception as e:
+        logger.error(f"Error scheduling job for {user_email}: {e}", exc_info=True)
+        return JSONResponse(content={"error": "Server error scheduling updates"}, status_code=500)
 
-    # Schedule the daily notification job for the user
-    notification_job_id = f"user_notification_{user_email}"
-    scheduler.add_job(
-        send_single_user_notification,
-        trigger='cron',
-        hour=hour,
-        minute=minute,
-        args=[user_email],
-        id=notification_job_id,
-        replace_existing=True
-    )
-
-    print(f"✅ Scheduled daily news for {user_email} at {preferred_time_str}.")
 
     return JSONResponse(content={
         "message": f"Success! Recommendations are being generated now. You will receive daily updates at {preferred_time_str}."
     })
 
+
 async def run_full_pipeline_task():
-    print("🚀 [BACKGROUND TASK] Starting the News-Verse pipeline...")
-    runSummarizer()
-    runSentiment()
-    runFactChecker()
-    runArticleScorer()
-    print("\n✅ [BACKGROUND TASK] News-Verse pipeline finished!")
+    try:
+        logger.info("[BACKGROUND TASK] Starting the News-Verse pipeline...")
+        runSummarizer()
+        runSentiment()
+        runFactChecker()
+        runArticleScorer()
+        logger.info("[BACKGROUND TASK] News-Verse pipeline finished!")
+    except Exception as e:
+        logger.error(f"[BACKGROUND TASK] Error running full pipeline: {e}", exc_info=True)
 
 
 @app.get('/run-pipeline')
@@ -547,6 +557,4 @@ async def trigger_pipeline(background_tasks: BackgroundTasks, request: Request):
             "message": "Pipeline started! News is being fetched and analyzed in the background."}
     )
 
-print("✅ FastAPI server is running in pure API mode.")
-
-# To run the app: uvicorn backend.main:app --reload --port 8000
+logger.info("FastAPI server is running in pure API mode.")

@@ -1,11 +1,17 @@
 import json
 from google.api_core.exceptions import ResourceExhausted
+import logging # New Import
 
 # Import from our new modules
 from Fact_Checker import db_manager
 from Fact_Checker.agents import get_fact_checker_agent # Import the agent creator
 from Fact_Checker.utils import parseJsonOutput
 from api_manager import api_manager # Import the manager
+
+# --- Logging Setup ---
+logger = logging.getLogger("FactCheckerPipeline")
+logger.setLevel(logging.INFO)
+
 
 def get_fact_check_from_llm(article_text):
     """
@@ -29,15 +35,15 @@ def get_fact_check_from_llm(article_text):
             return parseJsonOutput(response_content)
 
         except ResourceExhausted:
-            print("🚨 Gemini API rate limit exceeded. Switching to Groq for fact-checking...")
+            logger.warning("Gemini API rate limit exceeded. Switching to Groq for fact-checking...") # Replaced print
             api_manager.switch_to_groq()
             # The loop will automatically retry with the new Groq model
 
         except Exception as e:
-            print(f"An unexpected error occurred during fact-checking: {e}")
+            logger.error(f"An unexpected error occurred during fact-checking: {e}", exc_info=True) # Replaced print
             return None
 
-    print("❌ Failed to get a fact-check result after exhausting all available models.")
+    logger.error("Failed to get a fact-check result after exhausting all available models.") # Replaced print
     return None
 
 
@@ -47,13 +53,14 @@ def main():
     # 1. Connect to DB and fetch articles
     collection = db_manager.connectToDb()
     if collection is None:
+        logger.critical("Exiting: Database connection failed.") # Added logger
         return
 
     articles = db_manager.fetchAllArticles(collection)
 
     # Use a dummy article for testing if the DB is empty
     if not articles:
-        print("⚠️ No articles found in DB, using dummy article for testing.")
+        logger.warning("No articles found in DB, using dummy article for testing.") # Replaced print
         articles = [{"_id": "dummy1", "content": "Apple Inc. reported record revenue of $120 billion in Q4 2024."}]
 
     results = []
@@ -64,10 +71,10 @@ def main():
         article_text = article.get("content", "")
 
         if not article_text.strip():
-            print(f"⏭️  Skipping article {article_id} (empty content).")
+            logger.warning(f"Skipping article {article_id} (empty content).") # Replaced print
             continue
 
-        print(f"\n🔍 Fact-checking article {article_id}...")
+        logger.info(f"Fact-checking article {article_id}...") # Replaced print
 
         # 3. Run the agent and parse the response using the new robust function
         fact_result = get_fact_check_from_llm(article_text) # <<< INTEGRATION POINT
@@ -82,16 +89,16 @@ def main():
             # 4. Update the database
             db_manager.updateArticleFactCheck(collection, article["_id"], fact_result, article)
 
-            print(f"✅ Fact check result for article {article_id}: {fact_result}")
+            logger.info(f"Fact check result for article {article_id}: {fact_result}") # Replaced print
         else:
-            print(f"❌ Failed to get a valid JSON result for article {article_id}.")
+            logger.error(f"Failed to get a valid JSON result for article {article_id}.") # Replaced print
 
     # 5. Save results to a local file
     output_file = "fact_check_results.json"
     with open(output_file, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=4, ensure_ascii=False)
 
-    print(f"\n💾 Results for {len(results)} articles saved to {output_file}")
+    logger.info(f"Results for {len(results)} articles saved to {output_file}") # Replaced print
 
 if __name__ == "__main__":
     main()

@@ -1,11 +1,17 @@
 import json
 from google.api_core.exceptions import ResourceExhausted
+import logging # New Import
 
 # Import from our new modules
 from Sentiment_Analysis import db_manager
 from Sentiment_Analysis.agents import get_sentiment_agent # Import the agent creator
 from Sentiment_Analysis.utils import CleanJsonOutput
 from api_manager import api_manager # Import the manager
+
+# --- Logging Setup ---
+logger = logging.getLogger("SentimentAnalysis")
+logger.setLevel(logging.INFO)
+
 
 def main():
     """
@@ -14,13 +20,13 @@ def main():
     # 1. Connect to the database
     collection = db_manager.ConnectToMongoDB()
     if collection is None:
-        print("Exiting: Database connection failed.")
+        logger.critical("Exiting: Database connection failed.") # Replaced print
         return
 
     # 2. Fetch articles that need sentiment analysis
     articles = db_manager.FetchArticlesToAnalyzeSentiment(collection)
     if not articles:
-        print("No new articles to analyze for sentiment. All done!")
+        logger.info("No new articles to analyze for sentiment. All done!") # Replaced print
         return
 
     json_results = []
@@ -29,11 +35,11 @@ def main():
     for article in articles:
         content = article.get("content", "")
         if not content or not content.strip():
-            print(f"⏩ Skipping article '{article.get('title', 'N/A')}' due to empty content.")
+            logger.warning(f"Skipping article '{article.get('title', 'N/A')}' due to empty content.") # Replaced print
             continue
 
-        print("\n" + "="*80)
-        print(f"Processing Article: {article.get('title', 'N/A')}")
+        logger.info("="*80) # Replaced print
+        logger.info(f"Processing Article: {article.get('title', 'N/A')}") # Replaced print
 
         sentiment_data = None
         
@@ -51,16 +57,16 @@ def main():
 
                 cleaned_text = CleanJsonOutput(response_content)
                 sentiment_data = json.loads(cleaned_text)
-                print(f"   ✓ Sentiment: Generated")
+                logger.info("Sentiment: Generated") # Replaced print
                 break # If successful, exit the retry loop
             except ResourceExhausted:
-                print("🚨 Gemini API rate limit exceeded. Switching to Groq for sentiment analysis...")
+                logger.warning("Gemini API rate limit exceeded. Switching to Groq for sentiment analysis...") # Replaced print
                 api_manager.switch_to_groq()
                 # The loop will automatically retry with the new Groq model
             except Exception as e:
                 # Added type check for better logging
                 error_msg = f"'{type(response).__name__}' object has no attribute 'strip'" if 'strip' in str(e) and response is not None else e
-                print(f"   ✗ Sentiment: Failed ({error_msg})")
+                logger.error(f"Sentiment: Failed. Error: {error_msg}", exc_info=True) # Replaced print
                 break # For other errors, exit the loop
         # --- End of integration ---
         
@@ -73,7 +79,7 @@ def main():
                 article["_id"],
                 sentiment_text
             )
-            print(f"   💾 Database updated.")
+            logger.info("Database updated.") # Replaced print
 
         # Append to our local JSON file results
         json_results.append({
@@ -87,9 +93,9 @@ def main():
         filename = "sentiment_analysis.json"
         with open(filename, "w", encoding="utf-8") as f:
             json.dump(json_results, f, indent=2, ensure_ascii=False)
-        print(f"\n✅ Saved {len(json_results)} sentiment results to '{filename}'")
+        logger.info(f"Saved {len(json_results)} sentiment results to '{filename}'") # Replaced print
 
-    print("\n🎉 Sentiment analysis process complete!")
+    logger.info("Sentiment analysis process complete!") # Replaced print
 
 if __name__ == "__main__":
     main()
