@@ -32,7 +32,7 @@ async def main():
         return
 
     # Limit the total number of articles to 5
-    articles_to_process = articles_to_process[:20]
+    articles_to_process = articles_to_process[:10]
 
     logger.info(f"Discovered {len(articles_to_process)} article URLs to process.") # Replaced print
 

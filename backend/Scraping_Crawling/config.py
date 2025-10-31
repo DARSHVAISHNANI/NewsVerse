@@ -1,5 +1,5 @@
-MAX_ARTICLES_PER_SOURCE = 1
-OUTPUT_FILE = r"C:\Users\darsh\Desktop\Main Documents Folder\Newsverse-main\backend\data\input.json"
+MAX_ARTICLES_PER_SOURCE = 2
+OUTPUT_FILE = r"C:\Users\dharm\OneDrive\Desktop\NewsVerse\backend\Scraping_Crawling\output.json"
 
 # MongoDB Configuration
 MONGODB_URI = "mongodb+srv://dharminrajkotiya2005:9Ja3EY2PG6vL9fcp@newscluster.hi3xrwk.mongodb.net/?"
