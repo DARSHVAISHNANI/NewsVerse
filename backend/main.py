@@ -54,7 +54,7 @@ try:
     client = MongoClient(MONGO_URI)
     db = client["TestANewsVerseDB"]
     user_collection = db["UserDetails"]
-    articles_collection = db["ArticlesCollection"]
+    articles_collection = db["AC"]
     recommended_articles_collection = db["UserRecommendedArticles"]
     logger.info("Successfully connected to MongoDB.")
 except Exception as e:
@@ -343,6 +343,7 @@ async def get_articles_api(request: Request):
 async def get_recommendations_api(request: Request):
     """
     API endpoint to provide personalized article recommendations in JSON format.
+    Returns top 10 recommended articles from UserRecommendedArticles collection.
     """
     user_session = request.session.get('user')
     if not user_session:
@@ -354,16 +355,57 @@ async def get_recommendations_api(request: Request):
     if not user_recs_doc or not user_recs_doc.get("articles"):
         return []
 
-    recommended_ids_str = [rec["_id"] for rec in user_recs_doc["articles"]]
+    # Get user details for personalization and filtering
+    user_details = user_collection.find_one({"email": user_session['email']})
+    rated_articles = user_details.get("rated_articles", []) if user_details else []
+    liked_articles = user_details.get("title_id_list", []) if user_details else []
+    
+    # Convert liked articles to set for faster lookup
+    liked_articles_set = set(str(article_id) for article_id in liked_articles)
 
+    # Filter out articles that the user has already liked (already read)
+    # Start with top recommendations and filter out liked ones
+    recommended_ids_str = []
+    all_recommended = user_recs_doc["articles"]
+    
+    # Build list of recommended IDs, excluding already liked articles
+    for rec in all_recommended:
+        rec_id = rec["_id"]
+        if rec_id not in liked_articles_set:
+            recommended_ids_str.append(rec_id)
+            if len(recommended_ids_str) >= 10:
+                break  # We only need top 10
+
+    # If no recommendations left after filtering, return empty list
+    if not recommended_ids_str:
+        return []
+
+    # Fetch full article details for the filtered recommendations
     recommended_articles_cursor = articles_collection.find({
         "_id": {"$in": recommended_ids_str}
     })
 
-    recommended_articles = []
+    # Build article map to preserve order
+    articles_dict = {}
     for article in recommended_articles_cursor:
-        article["_id"] = str(article["_id"])
-        recommended_articles.append(article)
+        article_id = str(article["_id"])
+        articles_dict[article_id] = article
+
+    # Return articles in the order they were recommended, with user interaction data
+    recommended_articles = []
+    for rec_id in recommended_ids_str:
+        if rec_id in articles_dict:
+            article = articles_dict[rec_id].copy()
+            article["_id"] = str(article["_id"])
+            article["user_has_rated"] = rec_id in rated_articles
+            article["user_has_liked"] = rec_id in liked_articles
+            article["summarization"] = article.get("summarization", {})
+            article["fact_check"] = article.get("fact_check", {})
+            # Add similarity score if available from recommendation
+            rec_item = next((r for r in user_recs_doc["articles"] if r["_id"] == rec_id), None)
+            if rec_item and "similarity" in rec_item:
+                article["similarity"] = rec_item["similarity"]
+            recommended_articles.append(article)
 
     return recommended_articles
 
@@ -462,7 +504,7 @@ async def rate_article_api(
             return JSONResponse(content={"error": "Article already rated"}, status_code=400)
 
         articles_collection.update_one(
-            {"_id": ObjectId(article_id)}, 
+            {"_id": article_id}, 
             {
                 "$set": {"article_score.user_article_score": rating},
                 "$inc": {"article_score.total_ratings": 1},

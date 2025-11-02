@@ -12,7 +12,7 @@ NEWS_DB_NAME = "TestANewsVerseDB"
 USER_DB_NAME = "TestANewsVerseDB"
 
 # Collection Names
-NEWS_ARTICLES_COLLECTION = "ArticlesCollection"
+NEWS_ARTICLES_COLLECTION = "AC"
 USER_PROFILES_COLLECTION = "UserDetails"
 USER_ANALYSIS_COLLECTION = "UserPreferenceAnalysis"
 USER_RECOMMENDED_ARTICLES_COLLECTION = "UserRecommendedArticles"

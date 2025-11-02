@@ -10,9 +10,9 @@ from bs4 import BeautifulSoup
 from crawl4ai import AsyncWebCrawler, CrawlResult
 
 # Import from our new modules
-from config import *
-from parsers import PARSERS
-from utils import GetHeaders, PreprocessAndClean, HasGoodTitle, IsValidArticleUrl
+from . import config
+from .parsers import PARSERS
+from .utils import GetHeaders, PreprocessAndClean, HasGoodTitle, IsValidArticleUrl
 
 
 def BBCFilter(href: str, title: str, base_url: str) -> bool:

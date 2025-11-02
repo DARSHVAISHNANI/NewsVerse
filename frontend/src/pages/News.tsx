@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getArticles, Article } from "../api";
+import { getRecommendations, Article } from "../api";
 import ArticleDetailModal from "../components/ArticleDetailModal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
@@ -8,8 +8,8 @@ import ArticleCard from "../components/ArticleCard"; // Import the new card
 
 const News = () => {
   const { data: articles, isLoading, isError } = useQuery<Article[]>({
-    queryKey: ['articles'],
-    queryFn: async () => (await getArticles()).data,
+    queryKey: ['recommendations'],
+    queryFn: async () => (await getRecommendations()).data,
   });
 
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
@@ -54,7 +54,12 @@ const News = () => {
             </div>
         ) : isError ? (
             <div className="text-center text-destructive">
-                <p>Failed to fetch articles. Is the backend running?</p>
+                <p>Failed to fetch recommended articles. Is the backend running?</p>
+            </div>
+        ) : !articles || articles.length === 0 ? (
+            <div className="text-center text-muted-foreground py-12">
+                <p className="text-lg mb-2">No recommendations available yet.</p>
+                <p className="text-sm">Complete your preferences and check back later for personalized articles!</p>
             </div>
         ) : (
           <motion.div 
@@ -63,12 +68,12 @@ const News = () => {
             initial="hidden"
             animate="visible"
           >
-            {articles?.map((article) => (
+            {articles.map((article) => (
               <ArticleCard
                 key={article._id}
                 article={article}
                 onViewDetails={setSelectedArticle}
-                queryToInvalidate="articles"
+                queryToInvalidate="recommendations"
               />
             ))}
           </motion.div>

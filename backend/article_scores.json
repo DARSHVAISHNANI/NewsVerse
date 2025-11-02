@@ -1,0 +1,58 @@
+[
+    {
+        "title": "Five killed in jerusalem shooting attack, paramedics say",
+        "user_article_score": 9,
+        "llm_score": 6,
+        "final_custom_score": 7.2,
+        "score_reason": "Provides a detailed account of the shooting attack in Jerusalem, including the number of casualties, the location, and the response from security forces. It also mentions the absence of an immediate claim of responsibility and the security measures taken after the attack."
+    },
+    {
+        "title": "‘personal space, adequate light, ventilation and storage’: india assures belgium on mehul choksi if extradited",
+        "user_article_score": 4.666666666666667,
+        "llm_score": 6,
+        "final_custom_score": 5.47,
+        "score_reason": "The article provides a good overview of India's assurances to Belgium regarding Mehul Choksi's extradition, including details about the conditions of his potential detention. However, it lacks in-depth analysis or broader context beyond the immediate details of the letter and the case."
+    },
+    {
+        "title": "Vice-president election on sept 9: numbers back nda as radhakrishnan battles india bloc's reddy | 5 facts",
+        "user_article_score": 5,
+        "llm_score": 5,
+        "final_custom_score": 5.0,
+        "score_reason": "The article covers the basics of the upcoming vice-presidential election, including the candidates, the electoral college, and the numbers game. However, it lacks in-depth analysis or broader context, such as the political implications of the election or detailed profiles of the candidates beyond basic biographical information."
+    },
+    {
+        "title": "Asia cup 2025 schedule: full fixtures, match dates, venues, time and where to watch live | cricket news - the times of india",
+        "user_article_score": null,
+        "llm_score": 7,
+        "final_custom_score": 7,
+        "score_reason": "The article provides a comprehensive overview of the Asia Cup 2025 schedule, including match dates, venues, and timings. It also lists the squads for each participating team and details regarding live telecast and streaming."
+    },
+    {
+        "title": "Five killed in jerusalem shooting attack, paramedics say",
+        "user_article_score": 9,
+        "llm_score": 6,
+        "final_custom_score": 7.2,
+        "score_reason": "The article provides a detailed account of the shooting attack, including the number of casualties, the location, and the response from security forces. It also mentions the lack of immediate claim from armed groups and the police's efforts to secure the area and gather evidence. However, it could benefit from additional context or analysis to further enhance its depth."
+    },
+    {
+        "title": "‘personal space, adequate light, ventilation and storage’: india assures belgium on mehul choksi if extradited",
+        "user_article_score": 4.666666666666667,
+        "llm_score": 6,
+        "final_custom_score": 5.47,
+        "score_reason": "The article provides a good overview of India's assurance to Belgium regarding Mehul Choksi's extradition, including specific details about the conditions of his potential imprisonment. However, it lacks deeper analysis of the legal and diplomatic complexities of the extradition process."
+    },
+    {
+        "title": "Vice-president election on sept 9: numbers back nda as radhakrishnan battles india bloc's reddy | 5 facts",
+        "user_article_score": 5,
+        "llm_score": 6,
+        "final_custom_score": 5.6,
+        "score_reason": "The article provides a good overview of the upcoming vice-presidential election in India, including the candidates, the electoral college composition, and the numerical advantage of the NDA. It also touches upon the reason for the election and brief profiles of the candidates. However, it could benefit from more in-depth analysis of the candidates' backgrounds, their potential impact, and the broader political implications of the election. The article does contain one inaccuracy, stating that the election will occur on September 9th. The article was written on September 9th."
+    },
+    {
+        "title": "Asia cup 2025 schedule: full fixtures, match dates, venues, time and where to watch live | cricket news - the times of india",
+        "user_article_score": null,
+        "llm_score": 7,
+        "final_custom_score": 7,
+        "score_reason": "The article provides a detailed schedule of the Asia Cup 2025, including match dates, venues, and timings. It also includes information on team compositions and broadcast details, making it a comprehensive resource for readers interested in the tournament."
+    }
+]

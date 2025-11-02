@@ -30,7 +30,14 @@ def analyzeAllUsers(user_collection):
         for attempt in range(max_retries):
             try:
                 analysis_agent = get_analysis_agent()
-                summary = analysis_agent.run(str(ner_data))
+                response = analysis_agent.run(str(ner_data))
+                
+                # Extract the 'content' attribute from the RunOutput object
+                if hasattr(response, 'content'):
+                    summary = response.content
+                else:
+                    summary = str(response)
+                    
                 break 
             except ResourceExhausted:
                 logger.warning("Gemini API rate limit exceeded. Switching to Groq...")

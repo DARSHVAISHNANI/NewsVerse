@@ -13,7 +13,7 @@ load_dotenv(find_dotenv())
 # -----------------------------
 MONGO_URI = os.getenv("MONGO_URI")
 DB_NAME = "TestANewsVerseDB"
-COLLECTION_NAME = "ArticlesCollection"
+COLLECTION_NAME = "AC"
 
 # -----------------------------
 # API Keys (It's good practice to load them here too)

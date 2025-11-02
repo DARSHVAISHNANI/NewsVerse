@@ -10,7 +10,7 @@ load_dotenv()
 # --- MongoDB Configuration ---
 MONGO_URI = os.getenv("MONGO_URI")
 NEWS_DB_NAME = "TestANewsVerseDB"
-NEWS_COLLECTION_NAME = "ArticlesCollection"
+NEWS_COLLECTION_NAME = "AC"
 USER_DB_NAME = "TestANewsVerseDB"
 USER_PREF_COLLECTION_NAME = "UserPreferenceAnalysis"
 USER_INFO_COLLECTION_NAME = "UserDetails" # stores user_id + phone_number

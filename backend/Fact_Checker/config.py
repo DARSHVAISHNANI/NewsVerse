@@ -7,4 +7,4 @@ load_dotenv(find_dotenv())
 # MongoDB Configuration
 MONGO_URI = os.getenv("MONGO_URI")
 DB_NAME = "TestANewsVerseDB"
-COLLECTION_NAME = "ArticlesCollection"
+COLLECTION_NAME = "AC"

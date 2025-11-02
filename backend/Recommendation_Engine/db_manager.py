@@ -23,20 +23,21 @@ def connectToDbs():
         return None, None, None, None
 
 def fetchAllUsersForAnalysis(user_profiles_collection):
-    """Fetches name, email, title_list, and NER from the main user collection."""
+    """Fetches name, email, title_list, ner_data, and _id from the main user collection."""
     if user_profiles_collection is None:
         return []
-    # UPDATED: Fetch 'name' and 'email' instead of 'user_id'
-    return list(user_profiles_collection.find({}, {"name": 1, "email": 1, "title_list": 1, "NER": 1, "_id": 0}))
+    # FIXED: Changed "NER" to "ner_data" to match what NER module saves, and include _id for user_id
+    return list(user_profiles_collection.find({}, {"name": 1, "email": 1, "title_list": 1, "ner_data": 1, "_id": 1}))
 
 def saveUserAnalysis(user_analysis_collection, analysis_results):
     """Deletes old analysis and inserts the new results."""
     if user_analysis_collection is None:
         return
     user_analysis_collection.delete_many({})
-    # UPDATED: Use the new structure from the Pydantic model
+    # FIXED: Changed from attribute access (r.email) to dictionary access (r["email"])
+    # since user_analyzer returns dictionaries, not objects
     user_analysis_collection.insert_many([
-        {"email": r.email, "name": r.name, "detailed_summary": r.detailed_summary}
+        {"email": r["email"], "name": r["name"], "detailed_summary": r["detailed_summary"]}
         for r in analysis_results
     ])
     print(f"💾 Saved analysis for {len(analysis_results)} users to the database.")

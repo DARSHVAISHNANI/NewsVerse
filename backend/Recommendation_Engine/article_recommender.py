@@ -61,8 +61,24 @@ def rerank_articles_with_llm(user_summary: str, candidate_articles: list, top_n:
         print("⚠️ LLM failed to rank. Using original similarity ranking.")
         return candidate_articles[:top_n]
 
+    # Extract article IDs from the ranked list
+    # Handle both formats: list of strings ["id1", "id2"] or list of dicts [{"_id": "id1"}, ...]
+    extracted_ids = []
+    for item in ranked_ids:
+        if isinstance(item, str):
+            # Already a string ID
+            extracted_ids.append(item)
+        elif isinstance(item, dict):
+            # Extract ID from dictionary - try common key names
+            article_id = item.get("_id") or item.get("id") or item.get("article_id")
+            if article_id:
+                extracted_ids.append(str(article_id))
+        else:
+            # Convert other types to string
+            extracted_ids.append(str(item))
+
     article_map = {str(a["_id"]): a for a in candidate_articles}
-    return [article_map[article_id] for article_id in ranked_ids if article_id in article_map][:top_n]
+    return [article_map[article_id] for article_id in extracted_ids if article_id in article_map][:top_n]
     
 def suggestArticlesForUser(summary_embedding, all_articles: list, top_n: int = 20):
     """ Suggests top N articles using embeddings as an initial filter. """

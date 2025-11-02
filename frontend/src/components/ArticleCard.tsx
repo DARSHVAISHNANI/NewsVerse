@@ -25,14 +25,14 @@ import {
 interface ArticleCardProps {
   article: Article;
   onViewDetails: (article: Article) => void;
-  queryToInvalidate: 'articles' | 'randomArticles';
+  queryToInvalidate: 'articles' | 'randomArticles' | 'recommendations';
 }
 
 const ArticleCard = ({ article, onViewDetails, queryToInvalidate }: ArticleCardProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isRatingOpen, setIsRatingOpen] = useState(false);
-  const [rating, setRating] = useState(5);
+  const [rating, setRating] = useState(5); // Default rating set to 5
 
   const likeMutation = useMutation({
     mutationFn: () => toggleLike(article._id, article.title),
@@ -94,7 +94,7 @@ const ArticleCard = ({ article, onViewDetails, queryToInvalidate }: ArticleCardP
             </h3>
           </div>
 
-          {/* THE FIX: Footer with source on left, and horizontal row of buttons on right */}
+          {/* Footer with source on left, and horizontal row of buttons on right */}
           <div className="flex justify-between items-center w-full pt-4 mt-auto">
             <p className="text-xs text-muted-foreground">{article.source}</p>
             
@@ -148,10 +148,38 @@ const ArticleCard = ({ article, onViewDetails, queryToInvalidate }: ArticleCardP
         </motion.div>
       </TooltipProvider>
 
-      {/* Rating Dialog (no changes here) */}
+      {/* --- THIS IS THE FIX --- */}
+      {/* The DialogContent now contains the form for submitting a rating */}
       <DialogContent className="glass-card">
-        {/* ... */}
+        <form onSubmit={handleRatingSubmit}>
+          <DialogHeader>
+            <DialogTitle>Rate Article</DialogTitle>
+            <DialogDescription>
+              Give this article a score from 1 to 5. You can only rate an article once.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-4">
+            <Input
+              id="rating"
+              type="number"
+              value={rating}
+              // This logic ensures the value stays between 1 and 5
+              onChange={(e) => setRating(Math.max(1, Math.min(9, e.target.valueAsNumber || 1)))}
+              min="1"
+              max="9"
+            />
+          </div>
+
+          <DialogFooter>
+            <Button type="submit" disabled={rateMutation.isPending}>
+              {rateMutation.isPending ? "Submitting..." : "Submit Rating"}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
+      {/* --- END OF FIX --- */}
+
     </Dialog>
   );
 };

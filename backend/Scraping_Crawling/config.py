@@ -4,7 +4,7 @@ OUTPUT_FILE = r"C:\Users\darsh\Desktop\Main Documents Folder\Newsverse-main\back
 # MongoDB Configuration
 MONGODB_URI = "mongodb+srv://dharminrajkotiya2005:9Ja3EY2PG6vL9fcp@newscluster.hi3xrwk.mongodb.net/?"
 DATABASE_NAME = "TestANewsVerseDB"
-COLLECTION_NAME = "ArticlesCollection"
+COLLECTION_NAME = "AC"
 
 USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",

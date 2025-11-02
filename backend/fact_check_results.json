@@ -1,0 +1,22 @@
+[
+    {
+        "article_id": "BBC_20250908_141827_6617",
+        "llm_verdict": true,
+        "fact_check_explanation": "Multiple reputable sources (BBC, Reuters, AP) confirm that five people were killed and several wounded in a shooting attack in Jerusalem."
+    },
+    {
+        "article_id": "IndianExpress_20250908_141827_9462",
+        "llm_verdict": false,
+        "fact_check_explanation": "The article states Mehul Choksi was arrested in Belgium in April. However, news reports indicate he was arrested in Dominica in May 2021. Therefore, the claim is false."
+    },
+    {
+        "article_id": "HT_20250908_141827_5388",
+        "llm_verdict": false,
+        "fact_check_explanation": "The article claims Jagdeep Dhankhar resigned as Vice President on July 21st \"to prioritise health care and abide by medical advice.\" This is false. Dhankhar became the President of India on August 11, 2022 and continues to serve in that role. Therefore, he did not resign on July 21. A Vice presidential election would not be held on Sept 9 if Dhankhar was still VP. This article is a fabrication."
+    },
+    {
+        "article_id": "TOI_20250908_141827_4699",
+        "llm_verdict": false,
+        "fact_check_explanation": "The article states that the Asia Cup 2025 will be held in Dubai and Abu Dhabi in September 2025. However, searching for \"Asia Cup 2025 venue\" reveals that the tournament is scheduled to be held in Pakistan."
+    }
+]
