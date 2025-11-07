@@ -1,71 +1,168 @@
-# **NewsVerse**
+<div align="center">
 
-Welcome to **NewsVerse**, a full-stack, AI-powered news aggregation and recommendation platform.  
-This project ingests news from across the web, analyzes it using a sophisticated AI pipeline, and delivers personalized content to users through a modern web app and WhatsApp.
+# 📰 **NewsVerse**
+
+### *AI-Powered News Aggregation & Recommendation Platform*
+
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![React](https://img.shields.io/badge/React-18+-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-7.0+-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+
+**A sophisticated full-stack platform that ingests news from across the web, analyzes it using AI agents, and delivers personalized content through a modern web app and WhatsApp.**
+
+[Features](#-key-features) • [Architecture](#-project-architecture) • [Installation](#-how-to-run-the-project) • [Documentation](#-module-documentation)
+
+</div>
 
 ---
 
-## ✅ **Project Architecture**
+## 📋 **Table of Contents**
+
+- [✨ Key Features](#-key-features)
+- [🏗️ Project Architecture](#️-project-architecture)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [📚 Module Documentation](#-module-documentation)
+  - [Module 1: Scraping & Crawling](#-module-1-scraping--crawling)
+  - [Module 2: Article Processing Pipeline](#-module-2-article-processing-pipeline)
+  - [Module 3: Embedding Creation](#-module-3-embedding-creation)
+  - [Module 4: Article Scorer](#-module-4-article-scorer)
+  - [Module 5: Recommendation Engine](#-module-5-recommendation-engine)
+  - [Module 6: WhatsApp Messaging](#-module-6-whatsapp-messaging)
+- [💾 Database Schema](#-database-schema--format)
+- [🚀 How to Run the Project](#-how-to-run-the-project)
+- [📖 API Documentation](#-api-documentation)
+- [🔧 Development](#-development-sandbox)
+
+---
+
+## ✨ **Key Features**
+
+### 🤖 **AI-Powered Analysis**
+- **Dual Summarization**: Professional factual summaries + child-friendly story formats
+- **Fact-Checking**: Web-search verified claims with boolean verdicts
+- **Sentiment Analysis**: Positive/Negative/Neutral classification with reasoning
+- **Named Entity Recognition**: Extracts Person, Location, Organization entities
+
+### 🎯 **Personalized Recommendations**
+- **Behavioral Analysis**: Learns from user interactions and preferences
+- **Vector Similarity Matching**: Cosine similarity-based article recommendations
+- **Real-time Updates**: Dynamic preference profile generation
+- **Top 10 Curation**: Delivers most relevant articles per user
+
+### 📱 **Multi-Channel Delivery**
+- **Modern Web App**: React + TypeScript frontend with Tailwind CSS
+- **WhatsApp Integration**: Scheduled personalized news delivery via Twilio
+- **Responsive Design**: Optimized for all devices
+
+### 🔄 **Resilient Architecture**
+- **API Failover**: Automatic Gemini → Groq switching on rate limits
+- **Deduplication**: Smart article grouping to avoid redundant processing
+- **Hybrid Scoring**: Combines AI analysis (60%) with user feedback (40%)
+- **Comprehensive Logging**: MongoDB + local JSON file backups
+
+---
+
+## 🏗️ **Project Architecture**
 
 The project is built on a **decoupled monorepo structure**, containing three main parts:
 
-1. **`frontend/`** – A modern React + TypeScript web application that serves as the primary user interface.
-2. **`backend/`** – A Python-based microservice pipeline built with FastAPI and MongoDB—this is the core engine that scrapes, analyzes, and recommends articles.
-3. **`Raw_code_developer/`** – A development sandbox containing initial experiments, tutorials (e.g., Crawl4ai), and sample datasets.
+```
+NewsVerse/
+├── 📱 frontend/              # React + TypeScript web application
+├── ⚙️  backend/              # Python microservice pipeline
+│   ├── Scraping_Crawling/
+│   ├── Summarization/
+│   ├── Fact_Checker/
+│   ├── Sentiment_Analysis/
+│   ├── Name_Entity_Recognition/
+│   ├── Embedding_Creation/
+│   ├── Article_Scorer/
+│   ├── Recommendation_Engine/
+│   └── Whatsapp_Messaging/
+└── 🧪 Raw_code_developer/   # Development sandbox & experiments
+```
+
+### **Data Flow**
+
+```
+Web Sources → Scraping → Processing Pipeline → Embeddings → Scoring → Recommendations → Users
+                ↓              ↓                    ↓            ↓            ↓
+            MongoDB      AI Agents          Vector DB    Quality    Personalized
+                                                          Scores      Feed
+```
 
 ---
 
-## ✅ **Overall Tech Stack**
+## 🛠️ **Tech Stack**
 
 | Area | Technology |
 | :-- | :-- |
-| **Frontend** | React, TypeScript, Tailwind CSS, Vite |
-| **Backend** | Python, FastAPI, MongoDB |
-| **AI / ML** | LangChain/Custom Agents, SentenceTransformers (`all-MiniLM-L6-v2`) |
-| **Data Ingestion** | Crawl4ai, Custom Python (BeautifulSoup/Requests) |
+| **Frontend** | React 18+, TypeScript, Tailwind CSS, Vite, shadcn/ui |
+| **Backend** | Python 3.10+, FastAPI, MongoDB, APScheduler |
+| **AI Framework** | **[Agno Framework](https://github.com/agno-ai/agno)** - Agent orchestration & LLM integration |
+| **AI / ML** | LangChain, SentenceTransformers (`all-MiniLM-L6-v2`), scikit-learn |
+| **LLM Providers** | Google Gemini (Primary), Groq (Failover via Agno) |
+| **Data Ingestion** | Crawl4ai, BeautifulSoup, Requests |
 | **Messaging** | Twilio API (WhatsApp) |
+| **Authentication** | Google OAuth 2.0 |
+| **Vector Database** | MongoDB (embedding storage) |
+| **Task Scheduling** | APScheduler (CRON jobs) |
+
+### **Key Technologies Explained**
+
+#### **🤖 Agno Framework**
+[Agno](https://github.com/agno-ai/agno) is a powerful Python framework for building AI agents. In NewsVerse, we use Agno to:
+- Create specialized AI agents (Summarization, Fact-Checking, Sentiment Analysis, NER, Article Scoring)
+- Handle LLM provider management (Gemini, Groq)
+- Implement automatic API failover mechanisms
+- Orchestrate multi-agent workflows
+
+> **Special Thanks:** This project is built using the Agno Framework created by **Ashpreet B.** (CEO of Agno). The framework's agent-based architecture made it seamless to build and manage multiple AI agents for different tasks.
+
+#### **⚡ FastAPI**
+High-performance Python web framework used for:
+- RESTful API endpoints
+- User authentication (Google OAuth)
+- Background task scheduling
+- Pipeline orchestration endpoints
+
+#### **🎨 React + TypeScript**
+Modern frontend stack providing:
+- Type-safe component development
+- Responsive UI with Tailwind CSS
+- Real-time article recommendations
+- User preference management
+
+#### **💾 MongoDB**
+Document database storing:
+- Articles with embeddings
+- User profiles and preferences
+- Recommendation cache
+- Processing status tracking
 
 ---
 
-# ✅ **1. Frontend (`frontend/`)**
+## 📚 **Module Documentation**
 
-A responsive web application delivering full user experience.
-
-### ✅ Technologies
-- React
-- TypeScript
-- Tailwind CSS
-- `shadcn/ui` components
-
-### ✅ Key Pages & Features
-- **`Homepage.tsx`** — Landing page showcasing featured articles & app features.
-- **`News.tsx`** — Personalized news feed based on user recommendations.
-- **`Login.tsx` / `Onboarding.tsx`** — Handles authentication & preference gathering.
-- **`UserPreferences.tsx`** — Allows users to update interests; retrains preference profile.
-- **`components/ArticleCard.tsx`** — Reusable UI card for displaying article summaries.
-
----
-
-# ✅ **2. Backend (`backend/`)**
-
-The backend is the **AI-driven brain** of the system, implemented as an asynchronous data pipeline.
-
----
-
-## ✅ **Module 1: Scraping & Crawling**
+### ✅ **Module 1: Scraping & Crawling**
 
 **Directory:** `backend/Scraping_Crawling/`  
-**Purpose:** Fetch raw articles (links, titles, content).
+**Purpose:** Fetch raw articles (links, titles, content) from multiple news sources.
 
-### ✅ Hybrid Strategy
+#### **Hybrid Strategy**
 
-1. **Broad Discovery — `Crawl4ai`**
-   - Automatically discovers news articles across the web.
+1. **🌐 Broad Discovery — `Crawl4ai`**
+   - Automatically discovers news articles across the web
+   - Handles dynamic content and JavaScript-rendered pages
 
-2. **Reliable Extraction — Custom Parsers**
-   - For stable, major sources (BBC, CNN, HT, Benzinga), custom parser functions ensure consistency.
+2. **🎯 Reliable Extraction — Custom Parsers**
+   - For stable, major sources (BBC, CNN, HT, Benzinga), custom parser functions ensure consistency
+   - Handles source-specific HTML structures
 
-#### ✅ Conceptual Example (`parsers.py`)
+#### **Conceptual Example (`parsers.py`)**
+
 ```python
 def parse_bbc(soup):
     """Custom parser for BBC News articles."""
@@ -77,36 +174,26 @@ def parse_cnn(soup):
     content = soup.find('div', class_='article__content').text
     return content
 
-def parse_benzinga(soup):
-    """Custom parser for Benzinga articles."""
-    content = soup.find('div', class_='content-container').text
-    return content
-
 PARSER_MAP = {
     'bbc.com': parse_bbc,
     'cnn.com': parse_cnn,
     'hindustantimes.com': parse_ht,
     'benzinga.com': parse_benzinga
 }
-
-def get_parser_for_source(url):
-    for domain, func in PARSER_MAP.items():
-        if domain in url:
-            return func
-    return None
 ```
 
-### ✅ Data Output Structure (MongoDB)
+#### **Data Output Structure (MongoDB)**
+
 ```json
 {
-  "_id": "67f1b9f3e4b0c8a2b5f8e1a2",
-  "url": "https://www.bbc.com/news/world-politics-123456",
-  "source": "BBC",
-  "title": "Major Political Event Shakes Global Markets",
-  "content": "Today, a significant political development occurred...",
-  "date": "2025-11-08",
-  "time": "12:30:00",
-  "scraped_at": "2025-11-08T12:31:05Z",
+  "_id": "HT_20250908_141827_5388",
+  "source": "HT",
+  "title": "Vice-president election on Sept 9...",
+  "date": "2025-09-08",
+  "time": "13:43:25",
+  "content": "The stage is set for...",
+  "url": "https://www.hindustantimes.com/...",
+  "scraped_at": "2025-09-08T14:18:27.311+00:00",
   "processed_status": {
     "summarized": false,
     "fact_checked": false,
@@ -119,21 +206,20 @@ def get_parser_for_source(url):
 
 ---
 
-## ✅ **Module 2: Article Processing Pipeline**
+### ✅ **Module 2: Article Processing Pipeline**
 
 Once raw articles are collected, a series of AI agents enrich the data. All modules feature resilient API handling with automatic failover from Gemini to Groq when rate limits are encountered.
 
 ---
 
-### ✅ **A. Summarization**
+#### **🔹 A. Summarization**
 
-**Directory:** `backend/Summarization/`
-
+**Directory:** `backend/Summarization/`  
 **Agents Used:** 2 (Summarization Agent, Story Agent)
 
 **Purpose:** Generates two types of summaries for each article:
-1. **Factual Summary** — Concise, professional summary
-2. **Story Summary** — Child-friendly, engaging story format
+1. **Factual Summary** — Concise, professional summary (2-4 sentences)
+2. **Story Summary** — Child-friendly, engaging story format (3-5 sentences, ages 6-12)
 
 **How it Works (`run_summarization.py`):**
 
@@ -144,7 +230,7 @@ Once raw articles are collected, a series of AI agents enrich the data. All modu
    - Returns JSON with `summary` field
 3. **Generate Story Summary:** Calls `get_story_summary()` which:
    - Uses the Story Agent (Groq model: `openai/gpt-oss-120b`)
-   - Creates child-friendly summaries (3-5 sentences, simple language)
+   - Creates child-friendly summaries with simple language
    - Returns JSON with `story_summary` field
 4. **Update Database:** Saves both summaries to the article document
 
@@ -191,10 +277,9 @@ Rules:
 
 ---
 
-### ✅ **B. Fact-Checker**
+#### **🔹 B. Fact-Checker**
 
-**Directory:** `backend/Fact_Checker/`
-
+**Directory:** `backend/Fact_Checker/`**  
 **Agents Used:** 1 (Fact-Checker Agent with Web Search Tools)
 
 **Purpose:** Verifies factual claims in articles using web search tools and returns a boolean verdict.
@@ -204,10 +289,10 @@ Rules:
 1. **Fetch Articles:** Retrieves all articles from MongoDB
 2. **Extract Main Claim:** The agent identifies the primary factual claim
 3. **Web Search Verification:** Uses ONE of the following tools:
-   - DuckDuckGoTools
-   - GoogleSearchTools
-   - WebBrowserTools
-   - WebsiteTools
+   - `DuckDuckGoTools`
+   - `GoogleSearchTools`
+   - `WebBrowserTools`
+   - `WebsiteTools`
 4. **Compare Results:** Compares claim against top 3 reputable sources (BBC, Reuters, AP, Bloomberg, etc.)
 5. **Generate Verdict:** Returns boolean result with explanation
 6. **Update Database:** Saves fact-check results to article document
@@ -238,16 +323,15 @@ Example: {"llm_verdict": true, "fact_check_explanation": "The claim is supported
 ```
 
 **Features:**
-- **API Failover:** Automatically switches from Gemini to Groq on rate limits
-- **Tool-Based Verification:** Uses real web search to verify claims
-- **Reputable Source Focus:** Prioritizes trusted news sources for verification
+- ✅ **API Failover:** Automatically switches from Gemini to Groq on rate limits
+- ✅ **Tool-Based Verification:** Uses real web search to verify claims
+- ✅ **Reputable Source Focus:** Prioritizes trusted news sources for verification
 
 ---
 
-### ✅ **C. Sentiment Analysis**
+#### **🔹 C. Sentiment Analysis**
 
-**Directory:** `backend/Sentiment_Analysis/`
-
+**Directory:** `backend/Sentiment_Analysis/`  
 **Agents Used:** 1 (Sentiment Agent)
 
 **Purpose:** Classifies article sentiment as Positive, Negative, or Neutral with reasoning.
@@ -290,16 +374,15 @@ Determine sentiment strictly as **Positive, Negative, or Neutral** based on thes
 ```
 
 **Features:**
-- **API Failover:** Automatically switches from Gemini to Groq on rate limits
-- **Detailed Classification:** Provides reasoning for sentiment classification
-- **Keyword-Based Analysis:** Uses keyword detection and tone analysis
+- ✅ **API Failover:** Automatically switches from Gemini to Groq on rate limits
+- ✅ **Detailed Classification:** Provides reasoning for sentiment classification
+- ✅ **Keyword-Based Analysis:** Uses keyword detection and tone analysis
 
 ---
 
-### ✅ **D. Named Entity Recognition (NER)**
+#### **🔹 D. Named Entity Recognition (NER)**
 
-**Directory:** `backend/Name_Entity_Recognition/`
-
+**Directory:** `backend/Name_Entity_Recognition/`  
 **Agents Used:** 1 (NER Agent)
 
 **Purpose:** Extracts and aggregates named entities (Person, Location, Organization) from all articles a user has liked, storing them in the user's profile.
@@ -343,24 +426,62 @@ Do not include any other text, comments, or explanations. Return valid JSON only
 ```
 
 **Key Features:**
-- **User-Centric:** Processes entities per user, not per article
-- **Aggregation:** Combines entities from all user's liked articles
-- **Deduplication:** Removes duplicate entities automatically
-- **Profile Building:** Used to build user interest profiles for recommendations
+- ✅ **User-Centric:** Processes entities per user, not per article
+- ✅ **Aggregation:** Combines entities from all user's liked articles
+- ✅ **Deduplication:** Removes duplicate entities automatically
+- ✅ **Profile Building:** Used to build user interest profiles for recommendations
 
-**Note:** This module updates the **User Collection**, not the Article Collection, as it builds user preference profiles based on their reading history.
+> **Note:** This module updates the **User Collection**, not the Article Collection, as it builds user preference profiles based on their reading history.
 
 ---
 
-## ✅ **Module 3: Embedding Creation**
+### ✅ **Module 3: Embedding Creation**
 
 **Directory:** `backend/Embedding_Creation/`  
-Converts text into vector embeddings (e.g., 384-dim) for similarity matching.  
-**Model:** SentenceTransformer (`all-MiniLM-L6-v2`)
+**Purpose:** Converts article text into high-dimensional vector embeddings for semantic similarity matching.
+
+**How it Works (`embeddings.py`):**
+
+1. **Connect to Database:** Establishes connection to MongoDB article collection
+2. **Fetch Unprocessed Articles:** Retrieves articles that don't have embeddings yet
+3. **Generate Embeddings:** For each article:
+   - Combines `title` and `content` for richer context
+   - Uses SentenceTransformer model (`all-MiniLM-L6-v2`)
+   - Generates 384-dimensional vector embedding
+   - Converts to list format for MongoDB storage
+4. **Update Database:** Saves embedding array to article document
+5. **Logging:** Tracks progress and errors for each article
+
+**Model Details:**
+- **Model:** `all-MiniLM-L6-v2` (SentenceTransformers)
+- **Dimensions:** 384
+- **Purpose:** Semantic similarity matching for recommendations
+- **Input:** Article title + content (combined text)
+- **Output:** Vector array stored in `embedding` field
+
+**Code Example:**
+```python
+from Embedding_Creation.model_loader import embedding_model
+
+# Combine title and content for richer embedding
+text_to_embed = f"{article.get('title', '')} {article.get('content', '')}"
+
+# Generate the embedding
+embedding = embedding_model.encode(text_to_embed).tolist()
+
+# Store in MongoDB
+db_manager.updateArticleEmbedding(collection, article["_id"], embedding)
+```
+
+**Key Features:**
+- ✅ **Efficient Processing:** Only processes articles without embeddings
+- ✅ **Rich Context:** Combines title and content for better semantic representation
+- ✅ **Batch Processing:** Handles multiple articles efficiently
+- ✅ **Error Resilience:** Continues processing even if individual articles fail
 
 ---
 
-## ✅ **Module 4: Article Scorer**
+### ✅ **Module 4: Article Scorer**
 
 **Directory:** `backend/Article_Scorer/`  
 
@@ -370,7 +491,7 @@ Converts text into vector embeddings (e.g., 384-dim) for similarity matching.
 
 ---
 
-### ✅ **Prompt Used (`agents.py`)**
+#### **Prompt Used (`agents.py`)**
 
 This module uses a highly specific prompt with a 0-9 rubric based on "knowledge depth". The agent is instructed to return only a JSON object.
 
@@ -391,19 +512,19 @@ This module uses a highly specific prompt with a 0-9 rubric based on "knowledge 
 
 ---
 
-### ✅ **How it Works (`article_scorer.py`)**
+#### **How it Works (`article_scorer.py`)**
 
 The main script `article_scorer.py` orchestrates the entire scoring process through several key steps:
 
 ---
 
-#### **🔹 Step 1: Fetch & Group**
+##### **🔹 Step 1: Fetch & Group**
 
 The script fetches all articles from MongoDB and groups them by title to de-duplicate the scoring process. This ensures that duplicate articles (same title, different sources) receive the same score, avoiding redundant API calls.
 
 ---
 
-#### **🔹 Step 2: Get LLM Score**
+##### **🔹 Step 2: Get LLM Score**
 
 For one representative article from each group, the script calls the `get_llm_score` function. This function is designed to be robust and resilient:
 
@@ -420,7 +541,7 @@ For one representative article from each group, the script calls the `get_llm_sc
 
 ---
 
-#### **🔹 Step 3: Find User Score**
+##### **🔹 Step 3: Find User Score**
 
 The script iterates through the grouped articles to find any existing `user_article_score` (e.g., from a user's manual rating or feedback).
 
@@ -428,7 +549,7 @@ The script iterates through the grouped articles to find any existing `user_arti
 
 ---
 
-#### **🔹 Step 4: Calculate Final Score**
+##### **🔹 Step 4: Calculate Final Score**
 
 The `final_custom_score` is a weighted average that combines AI analysis with user feedback.
 
@@ -447,7 +568,7 @@ This weighted approach ensures that AI analysis carries more weight (60%) while 
 
 ---
 
-#### **🔹 Step 5: Update All & Save**
+##### **🔹 Step 5: Update All & Save**
 
 **Update MongoDB:**
 - The `final_score` and its components (`llm_score`, `user_article_score`) are saved back to all articles in the group in MongoDB
@@ -458,30 +579,30 @@ This weighted approach ensures that AI analysis carries more weight (60%) while 
 
 ---
 
-### ✅ **Key Features**
+#### **Key Features**
 
-- **Resilient API Handling:** Automatic failover from Gemini to Groq prevents scoring failures
-- **Deduplication:** Groups articles by title to avoid redundant scoring
-- **Hybrid Scoring:** Combines AI analysis (60%) with user feedback (40%)
-- **Comprehensive Logging:** Saves scores both to MongoDB and local JSON file
-- **Knowledge Depth Focus:** Uses a 0-9 rubric specifically designed to evaluate article depth and quality
+- ✅ **Resilient API Handling:** Automatic failover from Gemini to Groq prevents scoring failures
+- ✅ **Deduplication:** Groups articles by title to avoid redundant scoring
+- ✅ **Hybrid Scoring:** Combines AI analysis (60%) with user feedback (40%)
+- ✅ **Comprehensive Logging:** Saves scores both to MongoDB and local JSON file
+- ✅ **Knowledge Depth Focus:** Uses a 0-9 rubric specifically designed to evaluate article depth and quality
 
 ---
 
-## ✅ **Module 5: Recommendation Engine**
+### ✅ **Module 5: Recommendation Engine**
 
 **Directory:** `backend/Recommendation_Engine/`  
-Matches users with most relevant articles using a sophisticated multi-stage pipeline that combines user behavior analysis, AI-powered profile generation, and vector similarity matching.
+**Purpose:** Matches users with most relevant articles using a sophisticated multi-stage pipeline that combines user behavior analysis, AI-powered profile generation, and vector similarity matching.
 
 ---
 
-### ✅ **The Recommendation Pipeline: Complete Flow**
+#### **The Recommendation Pipeline: Complete Flow**
 
 The recommendation system follows a precise, multi-step process that transforms raw user interactions into personalized article recommendations.
 
 ---
 
-#### **🔹 Trigger: User Interaction**
+##### **🔹 Trigger: User Interaction**
 
 The pipeline begins when a user performs an action in the frontend:
 
@@ -494,7 +615,7 @@ These actions are logged in MongoDB, creating records of:
 
 ---
 
-#### **🔹 Step 1: User Analysis (`user_analyzer.py`)**
+##### **🔹 Step 1: User Analysis (`user_analyzer.py`)**
 
 When a recommendation is needed, this script creates a unified "profile" of the user's interests.
 
@@ -509,7 +630,7 @@ When a recommendation is needed, this script creates a unified "profile" of the 
 
 ---
 
-#### **🔹 Step 2: The Analysis Agent (`agents.py`)**
+##### **🔹 Step 2: The Analysis Agent (`agents.py`)**
 
 The raw user data is processed by an AI agent to distill it into a clean, meaningful profile.
 
@@ -537,7 +658,7 @@ Identify key topics, entities, and recurring themes.
 
 ---
 
-#### **🔹 Step 3: Profile Vectorization (`embeddings.py`)**
+##### **🔹 Step 3: Profile Vectorization (`embeddings.py`)**
 
 The clean "interest paragraph" from Step 2 is converted into a mathematical representation.
 
@@ -550,7 +671,7 @@ The clean "interest paragraph" from Step 2 is converted into a mathematical repr
 
 ---
 
-#### **🔹 Step 4: The Final Recommendation (`article_recommender.py`)**
+##### **🔹 Step 4: The Final Recommendation (`article_recommender.py`)**
 
 This is the core matching engine, triggered by:
 - Frontend requests (from `News.tsx`)
@@ -581,7 +702,7 @@ similarity_scores = cosine_similarity(user_vector, all_article_vectors)
 
 ---
 
-#### **🔹 Step 5: Ranking and Delivery**
+##### **🔹 Step 5: Ranking and Delivery**
 
 The final step sorts and delivers the most relevant articles.
 
@@ -595,7 +716,7 @@ The final step sorts and delivers the most relevant articles.
 
 ---
 
-### ✅ **Key Files in Recommendation Engine**
+#### **Key Files in Recommendation Engine**
 
 - **`user_analyzer.py`** — Analyzes user behavior and preferences
 - **`agents.py`** — Contains the User Analyzer Agent (LLM-based profile generation)
@@ -605,20 +726,48 @@ The final step sorts and delivers the most relevant articles.
 
 ---
 
-## ✅ **Module 6: WhatsApp Messaging**
+### ✅ **Module 6: WhatsApp Messaging**
 
-**Directory:** `backend/Whatsapp_Messaging/`
+**Directory:** `backend/Whatsapp_Messaging/`  
+**Purpose:** Delivers personalized news recommendations to users via WhatsApp using Twilio API, with scheduled delivery based on user preferences.
 
-- Uses Twilio API to send messages
-- Scheduled via CRON jobs
+**How it Works:**
+
+1. **Scheduled Tasks (`scheduler_tasks.py`):**
+   - Uses APScheduler to run periodic tasks
+   - Fetches users with phone numbers and preferred delivery times
+   - Triggers recommendation generation for each user
+
+2. **Message Generation (`whatsapp_sender.py`):**
+   - Retrieves top 10 recommended articles for each user
+   - Formats articles into WhatsApp-friendly message format
+   - Includes article titles, summaries, and links
+
+3. **Sending (`whatsapp_service.py`):**
+   - Uses Twilio API to send messages
+   - Handles message formatting and delivery
+   - Logs delivery status
+
+4. **Integration:**
+   - Connected to Recommendation Engine for article selection
+   - Respects user's `preferred_time` setting
+   - Sends daily/weekly digests based on user preferences
+
+**Key Features:**
+- ✅ **Scheduled Delivery:** CRON-based scheduling via APScheduler
+- ✅ **Personalized Content:** Uses recommendation engine for article selection
+- ✅ **Time Preferences:** Respects user's preferred delivery time
+- ✅ **Twilio Integration:** Reliable message delivery via Twilio API
 
 **Files:**
-- `whatsapp_sender.py`
-- `scheduler_tasks.py`
+- `whatsapp_sender.py` — Main sending logic
+- `whatsapp_service.py` — Twilio API integration
+- `scheduler_tasks.py` — Scheduled task management
+- `recommender.py` — Article recommendation integration
 
 ---
 
-## ✅ **Database Schema & Format**
+## 💾 **Database Schema & Format**
 
 The NewsVerse platform uses MongoDB to store articles, user data, preferences, and recommendations. Below are the detailed schemas for each collection.
 
@@ -642,7 +791,8 @@ The main collection storing all scraped and processed articles.
   "url": "https://www.hindustantimes.com/india-news/vice-president-election-on-s…",
   "scraped_at": "2025-09-08T14:18:27.311+00:00",
   "summarization": {
-    // Summary object from Summarization module
+    "summary": "Factual summary text...",
+    "story_summary": "Child-friendly story format..."
   },
   "sentiment": "Neutral",
   "fact_check": {
@@ -654,7 +804,7 @@ The main collection storing all scraped and processed articles.
     "llm_score": 6,
     "final_custom_score": 5.6
   },
-  "embedding": [/* Array of 768 dimensions */],
+  "embedding": [/* Array of 384 dimensions */],
   "rated_by": ["darshvaishnani1234@gmail.com"],
   "processed_status": {
     "summarized": true,
@@ -669,7 +819,7 @@ The main collection storing all scraped and processed articles.
 **Key Fields:**
 - **`_id`**: Unique identifier (format: `{SOURCE}_{DATE}_{TIME}_{RANDOM}`)
 - **`source`**: News source abbreviation (e.g., "HT", "BBC", "CNN")
-- **`embedding`**: Vector embedding (768 dimensions) for similarity matching
+- **`embedding`**: Vector embedding (384 dimensions) for similarity matching
 - **`article_score`**: Quality score from Article Scorer module
 - **`rated_by`**: Array of user emails who have rated this article
 
@@ -772,47 +922,8 @@ Stores pre-computed article recommendations for each user.
       "_id": "IndianExpress_20251001_004427_9329",
       "title": "BCCI ex-officio leaves ACC meeting midway in protest, says Mohsin Naqvi gave no clarity over Asia Cup trophy",
       "similarity": 0.2483
-    },
-    {
-      "_id": "TOI_20251001_004427_3699",
-      "title": "No flying school in India gets A+ or A in DGCA's first ever ranking",
-      "similarity": 0.1396
-    },
-    {
-      "_id": "IndianExpress_20250926_031021_9301",
-      "title": "Day after Ladakh violence, govt cancels FCRA licence of Wangchuk's NGO",
-      "similarity": 0.2252
-    },
-    {
-      "_id": "HT_20250926_031021_2081",
-      "title": "FCRA licence of Sonam Wangchuk's organisation cancelled over financial 'irregularities', he reacts",
-      "similarity": 0.2455
-    },
-    {
-      "_id": "TOI_20251031_230701_9744",
-      "title": "Journalist's death in UP: Priyanka says state government 'nurturing jungle raj'",
-      "similarity": 0.2882
-    },
-    {
-      "_id": "TOI_20250926_031021_7467",
-      "title": "Modi-Bibi ties have led to govt silence on 'genocide': Sonia Gandhi",
-      "similarity": 0.2721
-    },
-    {
-      "_id": "TOI_20251031_230130_7845",
-      "title": "Chirag Paswan: LJP implodes as uncle Paras isolates Chirag Paswan; Nitish Kumar's JD(U) says 'you reap what you sow'",
-      "similarity": 0.2439
-    },
-    {
-      "_id": "IndiaToday_20251031_230130_4500",
-      "title": "Usha has no plans to convert but…: JD Vance defends remarks on wife's faith",
-      "similarity": 0.2314
-    },
-    {
-      "_id": "HT_20251031_230701_6772",
-      "title": "'She has no plans to convert': JD Vance clarifies amid row over 'wife's conversion' remark",
-      "similarity": 0.1819
     }
+    // ... up to 10 articles
   ]
 }
 ```
@@ -828,40 +939,30 @@ Stores pre-computed article recommendations for each user.
 
 ---
 
-# ✅ **3. Development Sandbox (`Raw_code_developer/`)**
+## 🚀 **How to Run the Project**
 
-This directory contains:
+### ✅ **Prerequisites**
 
-- Early prototypes
-- Notebook experiments
-- Crawl4ai tutorials
-- Sample datasets
-  - e.g., `BBC_filtered_news_articles.json`
-- Initial Summarization / Fact-Check / Recommendation code
-
----
-
-# ✅ **How to Run the Project**
-
-## ✅ **Prerequisites**
-
-- Node.js ≥ 18
-- Python ≥ 3.10
-- MongoDB (local/cloud)
-- `.env` file with:
-  - OpenAI key
-  - Twilio key
-  - MongoDB URI
+- **Node.js** ≥ 18
+- **Python** ≥ 3.10
+- **MongoDB** (local or cloud instance)
+- **API Keys** (stored in `.env` file):
+  - Google OAuth credentials
+  - OpenAI/Groq API keys
+  - Gemini API key
+  - Twilio credentials
+  - MongoDB connection URI
 
 ---
 
-## ✅ **Backend Setup**
+### ✅ **Backend Setup**
 
 ```bash
+# Navigate to backend directory
 cd backend
 ```
 
-### Create & activate virtual environment:
+#### **Create & Activate Virtual Environment**
 
 **Mac/Linux:**
 ```bash
@@ -875,15 +976,39 @@ python -m venv venv
 .\venv\Scripts\activate
 ```
 
-### Install dependencies:
+#### **Install Dependencies**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Add API keys to `.env`
+#### **Configure Environment Variables**
 
-### Run FastAPI Server:
+Create a `.env` file in the `backend/` directory:
+
+```env
+# MongoDB
+MONGO_URI=your_mongodb_connection_string
+
+# Google OAuth
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+SECRET_KEY=your_secret_key
+
+# LLM APIs
+GEMINI_API_KEY=your_gemini_api_key
+GROQ_API_KEY=your_groq_api_key
+
+# Twilio
+TWILIO_ACCOUNT_SID=your_twilio_sid
+TWILIO_AUTH_TOKEN=your_twilio_token
+TWILIO_PHONE_NUMBER=your_twilio_phone
+
+# Frontend URL
+FRONTEND_URL=http://localhost:5173
+```
+
+#### **Run FastAPI Server**
 
 ```bash
 uvicorn main:app --reload
@@ -892,21 +1017,26 @@ uvicorn main:app --reload
 **Server runs at:**  
 👉 http://localhost:8000
 
+**API Documentation:**  
+👉 http://localhost:8000/docs (Swagger UI)  
+👉 http://localhost:8000/redoc (ReDoc)
+
 ---
 
-## ✅ **Frontend Setup**
+### ✅ **Frontend Setup**
 
 ```bash
+# Navigate to frontend directory
 cd frontend
 ```
 
-### Install dependencies:
+#### **Install Dependencies**
 
 ```bash
 npm install
 ```
 
-### Run Vite dev server:
+#### **Run Vite Dev Server**
 
 ```bash
 npm run dev
@@ -917,6 +1047,67 @@ npm run dev
 
 ---
 
+## 📖 **API Documentation**
+
+### **Main FastAPI Server (`main.py`)**
+
+The FastAPI server provides the following key endpoints:
+
+#### **Authentication Endpoints**
+- `GET /auth/google` - Initiate Google OAuth login
+- `GET /auth/callback` - OAuth callback handler
+- `GET /auth/logout` - Logout user
+- `GET /user` - Get current user information
+
+#### **Article Endpoints**
+- `GET /articles` - Get articles (with filtering/pagination)
+- `GET /articles/{article_id}` - Get specific article
+- `POST /articles/{article_id}/rate` - Rate an article
+
+#### **Recommendation Endpoints**
+- `GET /recommendations` - Get personalized recommendations for current user
+- `POST /preferences` - Update user preferences
+
+#### **Pipeline Endpoints** (Admin/Internal)
+- `POST /pipeline/summarize` - Run summarization pipeline
+- `POST /pipeline/fact-check` - Run fact-checking pipeline
+- `POST /pipeline/sentiment` - Run sentiment analysis pipeline
+- `POST /pipeline/score` - Run article scoring pipeline
+- `POST /pipeline/preprocess` - Run full preprocessing pipeline
+
+#### **WhatsApp Endpoints**
+- `POST /whatsapp/send` - Send WhatsApp message (internal)
+
+---
+
+## 🔧 **Development Sandbox**
+
+**Directory:** `Raw_code_developer/`
+
+This directory contains:
+
+- 🧪 **Early prototypes** - Initial proof-of-concept implementations
+- 📓 **Notebook experiments** - Jupyter notebooks for testing
+- 📚 **Crawl4ai tutorials** - Learning resources and examples
+- 📊 **Sample datasets** - Example JSON files for testing
+  - `BBC_filtered_news_articles.json`
+  - `fact_check_results.json`
+  - `sentiment_results.json`
+  - `user_database.json`
+- 💻 **Initial code** - Early versions of Summarization, Fact-Check, and Recommendation modules
+
+---
+
 ## 📝 **License**
 
 See [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+**Built with ❤️ using AI, React, and Python**
+
+[Report Bug](https://github.com/your-repo/issues) • [Request Feature](https://github.com/your-repo/issues) • [Documentation](#-module-documentation)
+
+</div>
