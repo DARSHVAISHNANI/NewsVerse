@@ -94,9 +94,10 @@ def get_parser_for_source(url):
         if domain in url:
             return func
     return None
-✅ Data Output Structure (MongoDB)
-json
-Copy code
+```
+
+### ✅ Data Output Structure (MongoDB)
+```json
 {
   "_id": "67f1b9f3e4b0c8a2b5f8e1a2",
   "url": "https://www.bbc.com/news/world-politics-123456",
@@ -114,18 +115,22 @@ Copy code
     "scored": false
   }
 }
-✅ Module 2: Article Processing Pipeline
+```
+
+---
+
+## ✅ **Module 2: Article Processing Pipeline**
+
 Once raw articles are collected, a series of AI agents enrich the data.
 
-✅ A. Summarization
-Directory: backend/Summarization/
+### ✅ **A. Summarization**
 
-Agents: Summarization Agent
+**Directory:** `backend/Summarization/`
 
-Example Prompt
+**Agents:** Summarization Agent
 
-css
-Copy code
+**Example Prompt**
+```
 You are a professional news editor. Summarize the following news article into
 3 key bullet points, followed by a concise 80-word paragraph.
 
@@ -133,158 +138,311 @@ Article:
 {article_text}
 
 Summary:
-✅ B. Fact-Checker
-Directory: backend/Fact_Checker/
+```
 
-Agents: Fact-Checking Agent
+### ✅ **B. Fact-Checker**
 
-Example Prompt
+**Directory:** `backend/Fact_Checker/`
 
-pgsql
-Copy code
+**Agents:** Fact-Checking Agent
+
+**Example Prompt**
+```
 Analyze the following article for factual accuracy. Identify the main claims.
 Return a JSON:
 1. "veracity_score": float (0.0–1.0)
 2. "explanation": brief justification
-✅ C. Sentiment Analysis
-Directory: backend/Sentiment_Analysis/
+```
 
-Agents: Sentiment Agent
+### ✅ **C. Sentiment Analysis**
 
-Example Prompt
+**Directory:** `backend/Sentiment_Analysis/`
 
-arduino
-Copy code
+**Agents:** Sentiment Agent
+
+**Example Prompt**
+```
 Classify article sentiment.
 Respond as one word:
 "Positive", "Negative", or "Neutral"
-✅ D. Named Entity Recognition (NER)
-Directory: backend/Name_Entity_Recognition/
+```
 
-Agents: NER Agent
+### ✅ **D. Named Entity Recognition (NER)**
 
-Example Prompt
+**Directory:** `backend/Name_Entity_Recognition/`
 
-pgsql
-Copy code
+**Agents:** NER Agent
+
+**Example Prompt**
+```
 Extract all named entities.
 Return JSON keys: "people", "organizations", "locations"
-✅ Module 3: Embedding Creation
-Directory: backend/Embedding_Creation/
-Converts text into vector embeddings (e.g., 384-dim) for similarity matching.
-Model: SentenceTransformer (all-MiniLM-L6-v2)
+```
 
-✅ Module 4: Article Scorer
-Directory: backend/Article_Scorer/
+---
+
+## ✅ **Module 3: Embedding Creation**
+
+**Directory:** `backend/Embedding_Creation/`  
+Converts text into vector embeddings (e.g., 384-dim) for similarity matching.  
+**Model:** SentenceTransformer (`all-MiniLM-L6-v2`)
+
+---
+
+## ✅ **Module 4: Article Scorer**
+
+**Directory:** `backend/Article_Scorer/`  
 Assigns a relevance/quality score per article.
 
-✅ Example Formula (conceptual)
-python
-Copy code
+### ✅ Example Formula (conceptual)
+```python
 llm_quality_score = agent_output      # 1–10
 fact_check_score = article.fact_check.veracity_score  # 0–1
 
 final_score = (w1 * llm_quality_score) + (w2 * fact_check_score)
-✅ Module 5: Recommendation Engine
-Directory: backend/Recommendation_Engine/
-Matches users with most relevant articles.
+```
 
-✅ How it works
-Converts user preferences → embedding
+---
 
-Computes cosine similarity to all article vectors
+## ✅ **Module 5: Recommendation Engine**
 
-Returns top N results
+**Directory:** `backend/Recommendation_Engine/`  
+Matches users with most relevant articles using a sophisticated multi-stage pipeline that combines user behavior analysis, AI-powered profile generation, and vector similarity matching.
 
-python
-Copy code
+---
+
+### ✅ **The Recommendation Pipeline: Complete Flow**
+
+The recommendation system follows a precise, multi-step process that transforms raw user interactions into personalized article recommendations.
+
+---
+
+#### **🔹 Trigger: User Interaction**
+
+The pipeline begins when a user performs an action in the frontend:
+
+- **Liking an article** (via `ArticleCard.tsx`)
+- **Defining interests** in their profile (via `UserPreferences.tsx`)
+
+These actions are logged in MongoDB, creating records of:
+- `liked_article_ids` — List of articles the user has interacted with
+- `explicit_preferences` — Raw text preferences (e.g., "I like AI and finance")
+
+---
+
+#### **🔹 Step 1: User Analysis (`user_analyzer.py`)**
+
+When a recommendation is needed, this script creates a unified "profile" of the user's interests.
+
+**Process:**
+1. Fetches two data sources from MongoDB:
+   - The user's `liked_article_ids`
+   - The user's `explicit_preferences` (raw text)
+2. Retrieves the full text content (or summaries) of all liked articles
+3. Collects all preference data into a single dataset
+
+**Output:** A collection of raw, "noisy" text data (e.g., 5 liked articles + 3 preference phrases)
+
+---
+
+#### **🔹 Step 2: The Analysis Agent (`agents.py`)**
+
+The raw user data is processed by an AI agent to distill it into a clean, meaningful profile.
+
+**Agent:** User Analyzer Agent (defined in `backend/Recommendation_Engine/agents.py`)
+
+**Example Prompt:**
+```
+You are a user profile analyzer. Based on the following articles a user has liked 
+({liked_article_content}) and their stated interests ({explicit_preferences}), 
+generate a single, dense paragraph that summarizes this user's true, nuanced interests. 
+Identify key topics, entities, and recurring themes.
+```
+
+**Example Transformation:**
+
+**Input:**
+- Article on Tesla
+- Article on NVIDIA stock
+- Preference: "AI"
+
+**Agent Output:**
+> "This user is interested in high-growth technology, specifically in the electric vehicle and artificial intelligence sectors. They follow key companies like Tesla and NVIDIA, and are interested in the financial market implications of new tech."
+
+**Result:** A single, high-quality "interest paragraph" that captures the user's true preferences.
+
+---
+
+#### **🔹 Step 3: Profile Vectorization (`embeddings.py`)**
+
+The clean "interest paragraph" from Step 2 is converted into a mathematical representation.
+
+**Process:**
+1. The interest paragraph is fed into the embedding model (from `backend/Embedding_Creation/embeddings.py`)
+2. Uses SentenceTransformer (`all-MiniLM-L6-v2`) to generate vector embeddings
+3. Output: A single **User Profile Vector** (e.g., a `[1, 384]` array)
+
+**Storage:** This vector is saved in the user's MongoDB document for quick retrieval, avoiding recomputation on every request.
+
+---
+
+#### **🔹 Step 4: The Final Recommendation (`article_recommender.py`)**
+
+This is the core matching engine, triggered by:
+- Frontend requests (from `News.tsx`)
+- WhatsApp service (from `whatsapp_sender.py`)
+
+**Process:**
+
+1. **Fetch User Profile Vector**
+   - Retrieves the pre-calculated User Profile Vector from MongoDB
+
+2. **Load Article Vectors**
+   - Loads all Article Vectors from the database (created by `Embedding_Creation/embeddings.py` when articles were first scraped)
+
+3. **Calculate Similarity**
+   - Uses cosine similarity to compute the mathematical "closeness" between the User Profile Vector and all Article Vectors
+
+**Code Implementation:**
+```python
 from sklearn.metrics.pairwise import cosine_similarity
 
+# user_vector.shape is [1, 384]
+# all_article_vectors.shape is [N, 384] (N = number of articles)
+
+# This calculates the similarity of the user to EVERY article
 similarity_scores = cosine_similarity(user_vector, all_article_vectors)
-top_10_indices = similarity_scores[0].argsort()[-10:][::-1]
-✅ Module 6: WhatsApp Messaging
-Directory: backend/Whatsapp_Messaging/
+# Result is an array like: [0.91, 0.23, 0.88, 0.05, ...]
+```
 
-Uses Twilio API to send messages
+---
 
-Scheduled via CRON jobs
+#### **🔹 Step 5: Ranking and Delivery**
 
-Files:
+The final step sorts and delivers the most relevant articles.
 
-whatsapp_sender.py
+**Process:**
+1. Sorts the `similarity_scores` array from highest to lowest
+2. Takes the **Top 10** article IDs from this sorted list
+3. Returns the final list as a JSON response to the frontend
+4. Frontend displays these articles to the user in `News.tsx`
 
-scheduler_tasks.py
+**Result:** Users receive personalized article recommendations that match their interests, behavior, and stated preferences.
 
-✅ 3. Development Sandbox (Raw_code_developer/)
+---
+
+### ✅ **Key Files in Recommendation Engine**
+
+- **`user_analyzer.py`** — Analyzes user behavior and preferences
+- **`agents.py`** — Contains the User Analyzer Agent (LLM-based profile generation)
+- **`article_recommender.py`** — Core matching engine using cosine similarity
+- **`engine.py`** — Orchestrates the recommendation pipeline
+- **`model_loader.py`** — Loads embedding models for vectorization
+
+---
+
+## ✅ **Module 6: WhatsApp Messaging**
+
+**Directory:** `backend/Whatsapp_Messaging/`
+
+- Uses Twilio API to send messages
+- Scheduled via CRON jobs
+
+**Files:**
+- `whatsapp_sender.py`
+- `scheduler_tasks.py`
+
+---
+
+# ✅ **3. Development Sandbox (`Raw_code_developer/`)**
+
 This directory contains:
 
-Early prototypes
+- Early prototypes
+- Notebook experiments
+- Crawl4ai tutorials
+- Sample datasets
+  - e.g., `BBC_filtered_news_articles.json`
+- Initial Summarization / Fact-Check / Recommendation code
 
-Notebook experiments
+---
 
-Crawl4ai tutorials
+# ✅ **How to Run the Project**
 
-Sample datasets
+## ✅ **Prerequisites**
 
-e.g., BBC_filtered_news_articles.json
+- Node.js ≥ 18
+- Python ≥ 3.10
+- MongoDB (local/cloud)
+- `.env` file with:
+  - OpenAI key
+  - Twilio key
+  - MongoDB URI
 
-Initial Summarization / Fact-Check / Recommendation code
+---
 
-✅ How to Run the Project
-✅ Prerequisites
-Node.js ≥ 18
+## ✅ **Backend Setup**
 
-Python ≥ 3.10
-
-MongoDB (local/cloud)
-
-.env file with:
-
-OpenAI key
-
-Twilio key
-
-MongoDB URI
-
-✅ Backend Setup
-bash
-Copy code
+```bash
 cd backend
-Create & activate virtual environment:
+```
 
-bash
-Copy code
+### Create & activate virtual environment:
+
+**Mac/Linux:**
+```bash
 python -m venv venv
-source venv/bin/activate     # Mac/Linux
-.\venv\Scripts\activate      # Windows
-Install dependencies:
+source venv/bin/activate
+```
 
-bash
-Copy code
+**Windows:**
+```bash
+python -m venv venv
+.\venv\Scripts\activate
+```
+
+### Install dependencies:
+
+```bash
 pip install -r requirements.txt
-Add API keys to .env
+```
 
-Run FastAPI Server:
+### Add API keys to `.env`
 
-bash
-Copy code
+### Run FastAPI Server:
+
+```bash
 uvicorn main:app --reload
-Server runs at:
+```
+
+**Server runs at:**  
 👉 http://localhost:8000
 
-✅ Frontend Setup
-bash
-Copy code
+---
+
+## ✅ **Frontend Setup**
+
+```bash
 cd frontend
-Install dependencies:
+```
 
-bash
-Copy code
+### Install dependencies:
+
+```bash
 npm install
-Run Vite dev server:
+```
 
-bash
-Copy code
+### Run Vite dev server:
+
+```bash
 npm run dev
-App runs at:
+```
+
+**App runs at:**  
 👉 http://localhost:5173
+
+---
+
+## 📝 **License**
+
+See [LICENSE](LICENSE) file for details.
