@@ -1,189 +1,290 @@
-# NewsVerse Backend
+# **NewsVerse**
 
-Welcome to the backend documentation for NewsVerse, a sophisticated news aggregation, analysis, and recommendation platform. This system is built as a series of interconnected microservices, leveraging AI agents to process, analyze, and deliver personalized news content.
-
-## Backend Tech Stack
-
-The backend is built primarily on a modern Python stack:
-
-* **Programming Language:** Python 3.10+
-* **API Framework:** FastAPI (inferred from `main.py` and `api_manager.py`)
-* **Database:** MongoDB (inferred from multiple `db_manager.py` files and developer code)
-* **AI Agent Framework:** An agent-based framework, likely using a library like **LangChain**, **AutoGen**, or a custom implementation (inferred from the multiple `agents.py` files).
-* **Embedding Model:** A sentence-transformer model (like `all-MiniLM-L6-v2`) for generating vector embeddings (inferred from `backend/Embedding_Creation/`).
-* **Messaging:** Twilio API for WhatsApp (inferred from `backend/Whatsapp_Messaging/`).
-* **Core Libraries:** `pymongo`, `uvicorn`, `scikit-learn` (for similarity metrics), `python-dotenv`.
-
-## Architecture Overview
-
-The backend operates as a processing pipeline orchestrated by `main.py` and `api_manager.py`. Raw articles are ingested and then passed sequentially through a series of analysis modules. The results are stored in MongoDB, where they are used by the recommendation engine to serve personalized content to users via the frontend API or WhatsApp.
-
-
-
-Here is a detailed breakdown of each component.
+Welcome to **NewsVerse**, a full-stack, AI-powered news aggregation and recommendation platform.  
+This project ingests news from across the web, analyzes it using a sophisticated AI pipeline, and delivers personalized content to users through a modern web app and WhatsApp.
 
 ---
 
-## 1. Scraping & Crawling
+## ✅ **Project Architecture**
 
-* **Directory:** `backend/Scraping_Crawling/`
-* **Purpose:** This module is the entry point for all data. It is responsible for fetching raw article data (links, titles, body text) from various news sources.
-* **Key Files:**
-    * `scraper.py`: Contains the core logic for visiting target websites and extracting URLs.
-    * `parsers.py`: Contains specific parsing logic for different website HTML structures.
-    * `db_manager.py`: Handles writing the raw, unprocessed articles into the database.
-* **Agents Used:** 0. This component appears to be a traditional web scraper (e.g., using `BeautifulSoup` or `Scrapy`) and does not use an LLM agent.
+The project is built on a **decoupled monorepo structure**, containing three main parts:
 
-## 2. Article Processing Pipeline
+1. **`frontend/`** – A modern React + TypeScript web application that serves as the primary user interface.
+2. **`backend/`** – A Python-based microservice pipeline built with FastAPI and MongoDB—this is the core engine that scrapes, analyzes, and recommends articles.
+3. **`Raw_code_developer/`** – A development sandbox containing initial experiments, tutorials (e.g., Crawl4ai), and sample datasets.
 
-Once articles are scraped, they are processed by a series of independent AI-driven modules. Each module reads an unprocessed article from the database, performs its task, and updates the article's document in MongoDB with new analytical data.
+---
 
-### A. Summarization
+## ✅ **Overall Tech Stack**
 
-* **Directory:** `backend/Summarization/`
-* **Purpose:** Generates a concise summary of the article body.
-* **Agents Used:** 1 (The Summarization Agent).
-* **Prompt Used:** The prompt logic is located in `agents.py`. It instructs the LLM to read a large text and distill its key points.
-    * **Example Prompt Template (replace with your actual prompt):**
-        ```python
-        prompt = f"""
-        You are a professional news editor. Summarize the following news article into 3 key bullet points, followed by a concise 80-word paragraph.
-        
-        Article:
-        {article_text}
-        
-        Summary:
-        """
-        ```
+| Area | Technology |
+| :-- | :-- |
+| **Frontend** | React, TypeScript, Tailwind CSS, Vite |
+| **Backend** | Python, FastAPI, MongoDB |
+| **AI / ML** | LangChain/Custom Agents, SentenceTransformers (`all-MiniLM-L6-v2`) |
+| **Data Ingestion** | Crawl4ai, Custom Python (BeautifulSoup/Requests) |
+| **Messaging** | Twilio API (WhatsApp) |
 
-### B. Fact-Checker
+---
 
-* **Directory:** `backend/Fact_Checker/`
-* **Purpose:** Assesses the factual veracity of the claims made in the article.
-* **Agents Used:** 1 (The Fact-Checking Agent).
-* **Prompt Used:** The prompt in `agents.py` is designed to make the LLM cross-verify information and provide a "veracity score." This agent may also use a search tool (not visible in filenames) to check claims against external sources.
-    * **Example Prompt Template (replace with your actual prompt):**
-        ```python
-        prompt = f"""
-        Analyze the following article for factual accuracy. Identify the main claims.
-        Return a JSON object with two keys:
-        1. "veracity_score": A score from 0.0 to 1.0, where 1.0 is completely factual.
-        2. "explanation": A brief explanation for your score, noting any unverified claims.
-        
-        Article:
-        {article_text}
-        
-        Analysis:
-        """
-        ```
+# ✅ **1. Frontend (`frontend/`)**
 
-### C. Sentiment Analysis
+A responsive web application delivering full user experience.
 
-* **Directory:** `backend/Sentiment_Analysis/`
-* **Purpose:** Determines the overall emotional tone of the article.
-* **Agents Used:** 1 (The Sentiment Analysis Agent).
-* **Prompt Used:** The prompt in `agents.py` instructs the LLM to classify the text into a predefined category.
-    * **Example Prompt Template (replace with your actual prompt):**
-        ```python
-        prompt = f"""
-        Classify the sentiment of the following news article.
-        Respond with only a single word: "Positive", "Negative", or "Neutral".
-        
-        Article:
-        {article_text}
-        
-        Sentiment:
-        """
-        ```
+### ✅ Technologies
+- React
+- TypeScript
+- Tailwind CSS
+- `shadcn/ui` components
 
-### D. Name Entity Recognition (NER)
+### ✅ Key Pages & Features
+- **`Homepage.tsx`** — Landing page showcasing featured articles & app features.
+- **`News.tsx`** — Personalized news feed based on user recommendations.
+- **`Login.tsx` / `Onboarding.tsx`** — Handles authentication & preference gathering.
+- **`UserPreferences.tsx`** — Allows users to update interests; retrains preference profile.
+- **`components/ArticleCard.tsx`** — Reusable UI card for displaying article summaries.
 
-* **Directory:** `backend/Name_Entity_Recognition/`
-* **Purpose:** Extracts key entities (people, organizations, locations) from the text. This is crucial for matching articles to user interests.
-* **Agents Used:** 1 (The NER Agent).
-* **Prompt Used:** The prompt in `agents.py` directs the LLM to act as an NER model and output structured data.
-    * **Example Prompt Template (replace with your actual prompt):**
-        ```python
-        prompt = f"""
-        Extract all named entities from the following text.
-        Return a JSON object with three lists as keys: "people", "organizations", and "locations".
-        If no entities are found for a category, return an empty list.
-        
-        Article:
-        {article_text}
-        
-        Entities:
-        """
-        ```
+---
 
-## 3. Embedding Creation
+# ✅ **2. Backend (`backend/`)**
 
-* **Directory:** `backend/Embedding_Creation/`
-* **Purpose:** This is a core ML module. It converts text data (both processed articles and user preferences) into numerical vector embeddings. These vectors allow for mathematical comparison of semantic similarity.
-* **Key Files:**
-    * `model_loader.py`: Loads the pre-trained embedding model (e.g., from SentenceTransformers).
-    * `embeddings.py`: Contains the function to take text and return a vector.
-    * `db_manager.py`: Updates database documents with their corresponding vector.
-* **Agents Used:** 0. This is a traditional ML model, not an LLM agent.
-* **Formula Used:** This module uses the loaded model (e.g., `all-MiniLM-L6-v2`) to perform a feed-forward pass, generating a vector (e.g., of 384 dimensions) for a given text.
+The backend is the **AI-driven brain** of the system, implemented as an asynchronous data pipeline.
 
-## 4. Article Scorer
+---
 
-* **Directory:** `backend/Article_Scorer/`
-* **Purpose:** Assigns a "quality" or "relevance" score to each article based on the combined outputs of the processing pipeline.
-* **Agents Used:** 1 (The Scoring Agent).
-* **Prompt Used:** The prompt in `agents.py` takes multiple data points (e.g., sentiment, fact-check score, timeliness) and asks the LLM to generate a single, holistic score.
-    * **Example Prompt Template (replace with your actual prompt):**
-        ```python
-        prompt = f"""
-        Based on the following analysis, score this article's overall quality from 1 (low) to 10 (high).
-        
-        Analysis:
-        - Fact-Check Score: {fact_check_score}
-        - Sentiment: {sentiment}
-        - NER Entities: {list_of_entities}
-        
-        Your score must be a single integer.
-        
-        Score:
-        """
-        ```
-* **Formula Used:** The agent itself may be one part of the score. A final formula in `article_scorer.py` likely combines the agent's score with other metrics.
-    * **Example Formula (replace with your actual formula):**
-        ```python
-        # w1, w2, w3 are weights you define
-        llm_score = agent_output 
-        final_score = (w1 * llm_score) + (w2 * fact_check_score) + (w3 * (1.0 - recency_decay))
-        ```
+## ✅ **Module 1: Scraping & Crawling**
 
-## 5. Recommendation Engine
+**Directory:** `backend/Scraping_Crawling/`  
+**Purpose:** Fetch raw articles (links, titles, content).
 
-* **Directory:** `backend/Recommendation_Engine/`
-* **Purpose:** This is the brain of the application. It matches users with relevant articles.
-* **Key Files:**
-    * `user_analyzer.py`: Analyzes a user's preferences and reading history to generate a "user profile vector." This might involve averaging the vectors of articles they liked.
-    * `article_recommender.py` / `engine.py`: The core logic that fetches the user vector and compares it against all article vectors in the database.
-* **Agents Used:** 1 (The User Analyzer Agent in `agents.py`). This agent might be used to convert a user's unstructured text preferences (e.g., "I like tech and finance") into a structured query or keyword list for the `user_analyzer.py`.
-* **Formula Used:** The core of the recommendation engine is **Cosine Similarity**. This formula measures the angle between the "user profile vector" and an "article vector." A smaller angle means higher similarity.
-    * **Core Formula (in `article_recommender.py`):**
-        ```python
-        from sklearn.metrics.pairwise import cosine_similarity
-        
-        # user_vector is a [1, 384] shape array
-        # article_vectors is a [N, 384] shape array (where N is num of articles)
-        
-        similarity_scores = cosine_similarity(user_vector, article_vectors)
-        
-        # Get the indices of the top-k highest scores
-        top_k_indices = similarity_scores[0].argsort()[-k:][::-1]
-        ```
+### ✅ Hybrid Strategy
 
-## 6. WhatsApp Messaging
+1. **Broad Discovery — `Crawl4ai`**
+   - Automatically discovers news articles across the web.
 
-* **Directory:** `backend/Whatsapp_Messaging/`
-* **Purpose:** Delivers the personalized news (generated by the Recommendation Engine) to users via WhatsApp.
-* **Key Files:**
-    * `whatsapp_sender.py`: Contains the logic to connect to the Twilio API and send a message.
-    * `recommender.py`: A local module that likely calls the main `Recommendation_Engine` to get a list of articles for a specific user.
-    * `scheduler_tasks.py`: Sets up a scheduled job (e.g., a CRON job) to run the recommendation and sending process automatically (e.g., every morning at 8 AM).
-* **Agents Used:** 0. This is a utility and delivery module.
+2. **Reliable Extraction — Custom Parsers**
+   - For stable, major sources (BBC, CNN, HT, Benzinga), custom parser functions ensure consistency.
+
+#### ✅ Conceptual Example (`parsers.py`)
+```python
+def parse_bbc(soup):
+    """Custom parser for BBC News articles."""
+    content = soup.find('article').text
+    return content
+
+def parse_cnn(soup):
+    """Custom parser for CNN articles."""
+    content = soup.find('div', class_='article__content').text
+    return content
+
+def parse_benzinga(soup):
+    """Custom parser for Benzinga articles."""
+    content = soup.find('div', class_='content-container').text
+    return content
+
+PARSER_MAP = {
+    'bbc.com': parse_bbc,
+    'cnn.com': parse_cnn,
+    'hindustantimes.com': parse_ht,
+    'benzinga.com': parse_benzinga
+}
+
+def get_parser_for_source(url):
+    for domain, func in PARSER_MAP.items():
+        if domain in url:
+            return func
+    return None
+✅ Data Output Structure (MongoDB)
+json
+Copy code
+{
+  "_id": "67f1b9f3e4b0c8a2b5f8e1a2",
+  "url": "https://www.bbc.com/news/world-politics-123456",
+  "source": "BBC",
+  "title": "Major Political Event Shakes Global Markets",
+  "content": "Today, a significant political development occurred...",
+  "date": "2025-11-08",
+  "time": "12:30:00",
+  "scraped_at": "2025-11-08T12:31:05Z",
+  "processed_status": {
+    "summarized": false,
+    "fact_checked": false,
+    "sentiment": false,
+    "ner": false,
+    "scored": false
+  }
+}
+✅ Module 2: Article Processing Pipeline
+Once raw articles are collected, a series of AI agents enrich the data.
+
+✅ A. Summarization
+Directory: backend/Summarization/
+
+Agents: Summarization Agent
+
+Example Prompt
+
+css
+Copy code
+You are a professional news editor. Summarize the following news article into
+3 key bullet points, followed by a concise 80-word paragraph.
+
+Article:
+{article_text}
+
+Summary:
+✅ B. Fact-Checker
+Directory: backend/Fact_Checker/
+
+Agents: Fact-Checking Agent
+
+Example Prompt
+
+pgsql
+Copy code
+Analyze the following article for factual accuracy. Identify the main claims.
+Return a JSON:
+1. "veracity_score": float (0.0–1.0)
+2. "explanation": brief justification
+✅ C. Sentiment Analysis
+Directory: backend/Sentiment_Analysis/
+
+Agents: Sentiment Agent
+
+Example Prompt
+
+arduino
+Copy code
+Classify article sentiment.
+Respond as one word:
+"Positive", "Negative", or "Neutral"
+✅ D. Named Entity Recognition (NER)
+Directory: backend/Name_Entity_Recognition/
+
+Agents: NER Agent
+
+Example Prompt
+
+pgsql
+Copy code
+Extract all named entities.
+Return JSON keys: "people", "organizations", "locations"
+✅ Module 3: Embedding Creation
+Directory: backend/Embedding_Creation/
+Converts text into vector embeddings (e.g., 384-dim) for similarity matching.
+Model: SentenceTransformer (all-MiniLM-L6-v2)
+
+✅ Module 4: Article Scorer
+Directory: backend/Article_Scorer/
+Assigns a relevance/quality score per article.
+
+✅ Example Formula (conceptual)
+python
+Copy code
+llm_quality_score = agent_output      # 1–10
+fact_check_score = article.fact_check.veracity_score  # 0–1
+
+final_score = (w1 * llm_quality_score) + (w2 * fact_check_score)
+✅ Module 5: Recommendation Engine
+Directory: backend/Recommendation_Engine/
+Matches users with most relevant articles.
+
+✅ How it works
+Converts user preferences → embedding
+
+Computes cosine similarity to all article vectors
+
+Returns top N results
+
+python
+Copy code
+from sklearn.metrics.pairwise import cosine_similarity
+
+similarity_scores = cosine_similarity(user_vector, all_article_vectors)
+top_10_indices = similarity_scores[0].argsort()[-10:][::-1]
+✅ Module 6: WhatsApp Messaging
+Directory: backend/Whatsapp_Messaging/
+
+Uses Twilio API to send messages
+
+Scheduled via CRON jobs
+
+Files:
+
+whatsapp_sender.py
+
+scheduler_tasks.py
+
+✅ 3. Development Sandbox (Raw_code_developer/)
+This directory contains:
+
+Early prototypes
+
+Notebook experiments
+
+Crawl4ai tutorials
+
+Sample datasets
+
+e.g., BBC_filtered_news_articles.json
+
+Initial Summarization / Fact-Check / Recommendation code
+
+✅ How to Run the Project
+✅ Prerequisites
+Node.js ≥ 18
+
+Python ≥ 3.10
+
+MongoDB (local/cloud)
+
+.env file with:
+
+OpenAI key
+
+Twilio key
+
+MongoDB URI
+
+✅ Backend Setup
+bash
+Copy code
+cd backend
+Create & activate virtual environment:
+
+bash
+Copy code
+python -m venv venv
+source venv/bin/activate     # Mac/Linux
+.\venv\Scripts\activate      # Windows
+Install dependencies:
+
+bash
+Copy code
+pip install -r requirements.txt
+Add API keys to .env
+
+Run FastAPI Server:
+
+bash
+Copy code
+uvicorn main:app --reload
+Server runs at:
+👉 http://localhost:8000
+
+✅ Frontend Setup
+bash
+Copy code
+cd frontend
+Install dependencies:
+
+bash
+Copy code
+npm install
+Run Vite dev server:
+
+bash
+Copy code
+npm run dev
+App runs at:
+👉 http://localhost:5173
