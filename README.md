@@ -121,63 +121,234 @@ def get_parser_for_source(url):
 
 ## ✅ **Module 2: Article Processing Pipeline**
 
-Once raw articles are collected, a series of AI agents enrich the data.
+Once raw articles are collected, a series of AI agents enrich the data. All modules feature resilient API handling with automatic failover from Gemini to Groq when rate limits are encountered.
+
+---
 
 ### ✅ **A. Summarization**
 
 **Directory:** `backend/Summarization/`
 
-**Agents:** Summarization Agent
+**Agents Used:** 2 (Summarization Agent, Story Agent)
 
-**Example Prompt**
+**Purpose:** Generates two types of summaries for each article:
+1. **Factual Summary** — Concise, professional summary
+2. **Story Summary** — Child-friendly, engaging story format
+
+**How it Works (`run_summarization.py`):**
+
+1. **Fetch Articles:** Retrieves articles from MongoDB that need summarization
+2. **Generate Factual Summary:** Calls `get_factual_summary()` which:
+   - Uses the Summarization Agent (Groq model: `openai/gpt-oss-120b`)
+   - Handles API failover (Gemini → Groq on rate limits)
+   - Returns JSON with `summary` field
+3. **Generate Story Summary:** Calls `get_story_summary()` which:
+   - Uses the Story Agent (Groq model: `openai/gpt-oss-120b`)
+   - Creates child-friendly summaries (3-5 sentences, simple language)
+   - Returns JSON with `story_summary` field
+4. **Update Database:** Saves both summaries to the article document
+
+**Agent Prompts (`agents.py`):**
+
+**Summarization Agent:**
 ```
-You are a professional news editor. Summarize the following news article into
-3 key bullet points, followed by a concise 80-word paragraph.
+You are a news article summarizer. Summarize the given article text in 2-4 sentences.
 
-Article:
-{article_text}
+Return JSON in this exact format:
+{
+    "summary": "<short, concise summary of the article>"
+}
 
-Summary:
+Do NOT include anything outside the JSON object.
 ```
+
+**Story Agent:**
+```
+You are a children's story writer. Read the article carefully and summarize it in a fun, 
+simple, and easy-to-read way for kids.
+
+Rules:
+1. Use simple language suitable for 6-12 year old children.
+2. Make it engaging like a short story.
+3. Keep the summary concise (3-5 sentences max).
+4. Focus on the main events or important points, but avoid technical jargon.
+5. Return JSON in this exact format:
+{
+    "story_summary": "<summary written as a story for kids>"
+}
+6. Do NOT include anything outside the JSON object.
+```
+
+**Output Format:**
+```json
+{
+  "summarization": {
+    "summary": "Concise factual summary...",
+    "story_summary": "Child-friendly story format..."
+  }
+}
+```
+
+---
 
 ### ✅ **B. Fact-Checker**
 
 **Directory:** `backend/Fact_Checker/`
 
-**Agents:** Fact-Checking Agent
+**Agents Used:** 1 (Fact-Checker Agent with Web Search Tools)
 
-**Example Prompt**
+**Purpose:** Verifies factual claims in articles using web search tools and returns a boolean verdict.
+
+**How it Works (`fact_checker.py`):**
+
+1. **Fetch Articles:** Retrieves all articles from MongoDB
+2. **Extract Main Claim:** The agent identifies the primary factual claim
+3. **Web Search Verification:** Uses ONE of the following tools:
+   - DuckDuckGoTools
+   - GoogleSearchTools
+   - WebBrowserTools
+   - WebsiteTools
+4. **Compare Results:** Compares claim against top 3 reputable sources (BBC, Reuters, AP, Bloomberg, etc.)
+5. **Generate Verdict:** Returns boolean result with explanation
+6. **Update Database:** Saves fact-check results to article document
+7. **Save Local Copy:** Writes results to `fact_check_results.json`
+
+**Agent Instructions (`agents.py`):**
 ```
-Analyze the following article for factual accuracy. Identify the main claims.
-Return a JSON:
-1. "veracity_score": float (0.0–1.0)
-2. "explanation": brief justification
+Step 1: Read the provided news article text.
+Step 2: Extract the main factual claim from the article.
+Step 3: Use ONLY ONE search (DuckDuckGo, GoogleSearch, WebBrowser, or WebsiteTools) for that claim.
+Step 4: Compare the claim to the top 3 reputable search results (BBC, Reuters, AP, Bloomberg, etc.).
+Step 5: Decide if the claim is factually correct (true or false).
+Step 6: Output the result ONLY in a raw JSON object (no markdown block or surrounding text). 
+The JSON MUST have exactly two fields: 'llm_verdict' (boolean: true/false) and 
+'fact_check_explanation' (string: short reason).
+
+Example: {"llm_verdict": true, "fact_check_explanation": "The claim is supported by multiple reputable sources."}
 ```
+
+**Output Format:**
+```json
+{
+  "fact_check": {
+    "llm_verdict": false,
+    "fact_check_explanation": "The article claims that Jagdeep Dhankhar resigned as Vice President on..."
+  }
+}
+```
+
+**Features:**
+- **API Failover:** Automatically switches from Gemini to Groq on rate limits
+- **Tool-Based Verification:** Uses real web search to verify claims
+- **Reputable Source Focus:** Prioritizes trusted news sources for verification
+
+---
 
 ### ✅ **C. Sentiment Analysis**
 
 **Directory:** `backend/Sentiment_Analysis/`
 
-**Agents:** Sentiment Agent
+**Agents Used:** 1 (Sentiment Agent)
 
-**Example Prompt**
+**Purpose:** Classifies article sentiment as Positive, Negative, or Neutral with reasoning.
+
+**How it Works (`sentiment.py`):**
+
+1. **Fetch Articles:** Retrieves articles that need sentiment analysis
+2. **Analyze Content:** Agent analyzes tone and language
+3. **Classify Sentiment:** Returns classification with reason
+4. **Update Database:** Saves sentiment to article document
+5. **Save Local Copy:** Writes results to `sentiment_analysis.json`
+
+**Agent Instructions (`agents.py`):**
 ```
-Classify article sentiment.
-Respond as one word:
-"Positive", "Negative", or "Neutral"
+You are a sentiment evaluation agent. Analyze the tone and language of the article text.  
+Determine sentiment strictly as **Positive, Negative, or Neutral** based on these rules:
+
+1. **Positive** → The article contains positive keywords (e.g., growth, profit, gain, recovery, 
+   expansion, strong, successful), or the overall tone is optimistic and confidence-building.  
+2. **Negative** → The article contains negative keywords (e.g., loss, decline, fall, risk, weak, 
+   downgrade, failure), or the overall tone is pessimistic, warning, or confidence-reducing.  
+3. **Neutral** → The article is mainly factual, descriptive, or balanced — with no clear 
+   positive or negative tone. Includes objective reporting, announcements, or mixed signals.  
+4. Return only JSON in this exact format:
+
+{
+    "sentiment": "<Positive|Negative|Neutral>",
+    "reason": "<short reason explaining the classification>"
+}
+
+5. Reason should be brief (1-2 sentences).  
+6. Do NOT include anything outside the JSON object.
 ```
+
+**Output Format:**
+```json
+{
+  "sentiment": "Neutral"
+}
+```
+
+**Features:**
+- **API Failover:** Automatically switches from Gemini to Groq on rate limits
+- **Detailed Classification:** Provides reasoning for sentiment classification
+- **Keyword-Based Analysis:** Uses keyword detection and tone analysis
+
+---
 
 ### ✅ **D. Named Entity Recognition (NER)**
 
 **Directory:** `backend/Name_Entity_Recognition/`
 
-**Agents:** NER Agent
+**Agents Used:** 1 (NER Agent)
 
-**Example Prompt**
+**Purpose:** Extracts and aggregates named entities (Person, Location, Organization) from all articles a user has liked, storing them in the user's profile.
+
+**How it Works (`NER.py`):**
+
+1. **Fetch Users:** Retrieves all users from the user collection
+2. **Get User's Liked Articles:** For each user, retrieves their `title_id_list` (articles they've interacted with)
+3. **Process Each Article:** For each article in the user's list:
+   - Fetches article content from the article collection
+   - Runs NER agent on the content
+   - Extracts entities (Person, Location, Organization)
+4. **Aggregate Entities:** Combines all entities from all user's articles into a single aggregated list (removes duplicates)
+5. **Update User Profile:** Saves aggregated entities to the user's `ner_data` field in MongoDB
+
+**Agent Instructions (`agents.py`):**
 ```
-Extract all named entities.
-Return JSON keys: "people", "organizations", "locations"
+Extract all unique named entities from the following news article text and categorize them 
+as "Person", "Location" (including cities/countries/regions), or "Organization" 
+(companies, institutions). 
+
+Return strictly a JSON object in this format:
+{
+  "Person": [list of unique person names],
+  "Location": [list of unique locations],
+  "Organization": [list of unique organizations]
+}
+
+Do not include any other text, comments, or explanations. Return valid JSON only.
 ```
+
+**Output Format (in User Collection):**
+```json
+{
+  "ner_data": {
+    "Person": ["Rohit Arya", "Deepak Kesarkar", "Ashish Shelar", ...],
+    "Location": ["Mumbai", "Pune", "Maharashtra", ...],
+    "Organization": ["BCCI", "School Education Department", ...]
+  }
+}
+```
+
+**Key Features:**
+- **User-Centric:** Processes entities per user, not per article
+- **Aggregation:** Combines entities from all user's liked articles
+- **Deduplication:** Removes duplicate entities automatically
+- **Profile Building:** Used to build user interest profiles for recommendations
+
+**Note:** This module updates the **User Collection**, not the Article Collection, as it builds user preference profiles based on their reading history.
 
 ---
 
@@ -192,15 +363,108 @@ Converts text into vector embeddings (e.g., 384-dim) for similarity matching.
 ## ✅ **Module 4: Article Scorer**
 
 **Directory:** `backend/Article_Scorer/`  
-Assigns a relevance/quality score per article.
 
-### ✅ Example Formula (conceptual)
+**Purpose:** This module assigns a hybrid "quality" score to each article by combining an AI-generated "knowledge depth" score with a (potential) user-provided score. It is designed to be resilient, with a built-in failover from the Gemini API to Groq.
+
+**Agents Used:** 1 (The Article Scoring Agent)
+
+---
+
+### ✅ **Prompt Used (`agents.py`)**
+
+This module uses a highly specific prompt with a 0-9 rubric based on "knowledge depth". The agent is instructed to return only a JSON object.
+
 ```python
-llm_quality_score = agent_output      # 1–10
-fact_check_score = article.fact_check.veracity_score  # 0–1
-
-final_score = (w1 * llm_quality_score) + (w2 * fact_check_score)
+# This is the exact prompt from agents.py
+"You are an evaluator of news articles.\n"
+"Score each article from 0 to 9 based on knowledge depth:\n\n"
+"0–2: Poor — highly superficial, incomplete, or factually questionable.\n"
+"3–5: Moderate — covers basics but lacks depth or misses key points.\n"
+"6–8: Good — detailed, covers multiple aspects, balanced and factual.\n"
+"9: Exceptional — comprehensive, in-depth, authoritative, and well-structured.\n\n"
+"Return valid JSON only in the format:\n"
+"{\n"
+'  "score": <integer 0–9>,\n'
+'  "reason": "<short reason>"\n'
+"}"
 ```
+
+---
+
+### ✅ **How it Works (`article_scorer.py`)**
+
+The main script `article_scorer.py` orchestrates the entire scoring process through several key steps:
+
+---
+
+#### **🔹 Step 1: Fetch & Group**
+
+The script fetches all articles from MongoDB and groups them by title to de-duplicate the scoring process. This ensures that duplicate articles (same title, different sources) receive the same score, avoiding redundant API calls.
+
+---
+
+#### **🔹 Step 2: Get LLM Score**
+
+For one representative article from each group, the script calls the `get_llm_score` function. This function is designed to be robust and resilient:
+
+**Process:**
+1. Attempts to get a score from the primary model (Gemini) via the `api_manager`
+2. The agent analyzes the article content and returns a JSON with:
+   - `score`: Integer from 0-9
+   - `reason`: Short explanation
+
+**API Failover Mechanism:**
+- If the Gemini API fails due to rate limits (`ResourceExhausted`), the `api_manager` is instructed to `switch_to_groq()`
+- The function automatically retries the request using the Groq model as a failover
+- This ensures the scoring process continues even when one API is unavailable
+
+---
+
+#### **🔹 Step 3: Find User Score**
+
+The script iterates through the grouped articles to find any existing `user_article_score` (e.g., from a user's manual rating or feedback).
+
+**Purpose:** Incorporates user feedback into the final score when available.
+
+---
+
+#### **🔹 Step 4: Calculate Final Score**
+
+The `final_custom_score` is a weighted average that combines AI analysis with user feedback.
+
+**Formula Used (`article_scorer.py`):**
+
+```python
+# This is the exact formula from article_scorer.py
+final_score = round((llm_score * 0.6) + (user_score * 0.4), 2) if user_score is not None else llm_score
+```
+
+**Scoring Logic:**
+- **If user_score exists:** `final_score = (60% × llm_score) + (40% × user_score)`
+- **If no user_score:** `final_score = llm_score`
+
+This weighted approach ensures that AI analysis carries more weight (60%) while still incorporating valuable user feedback (40%) when available.
+
+---
+
+#### **🔹 Step 5: Update All & Save**
+
+**Update MongoDB:**
+- The `final_score` and its components (`llm_score`, `user_article_score`) are saved back to all articles in the group in MongoDB
+- This ensures all duplicate articles receive the same score
+
+**Save Local Copy:**
+- All scores are also saved to a local `article_scores.json` file for logging and backup purposes
+
+---
+
+### ✅ **Key Features**
+
+- **Resilient API Handling:** Automatic failover from Gemini to Groq prevents scoring failures
+- **Deduplication:** Groups articles by title to avoid redundant scoring
+- **Hybrid Scoring:** Combines AI analysis (60%) with user feedback (40%)
+- **Comprehensive Logging:** Saves scores both to MongoDB and local JSON file
+- **Knowledge Depth Focus:** Uses a 0-9 rubric specifically designed to evaluate article depth and quality
 
 ---
 
@@ -351,6 +615,216 @@ The final step sorts and delivers the most relevant articles.
 **Files:**
 - `whatsapp_sender.py`
 - `scheduler_tasks.py`
+
+---
+
+## ✅ **Database Schema & Format**
+
+The NewsVerse platform uses MongoDB to store articles, user data, preferences, and recommendations. Below are the detailed schemas for each collection.
+
+---
+
+### ✅ **1. Article Collection**
+
+The main collection storing all scraped and processed articles.
+
+**Collection Name:** `articles` (or similar, as configured)
+
+**Document Structure:**
+```json
+{
+  "_id": "HT_20250908_141827_5388",
+  "source": "HT",
+  "title": "Vice-president election on Sept 9: Numbers back NDA as Radhakrishnan b…",
+  "date": "2025-09-08",
+  "time": "13:43:25",
+  "content": "The stage is set for CP Radhakrishnan andSudershan Reddyto battle it o…",
+  "url": "https://www.hindustantimes.com/india-news/vice-president-election-on-s…",
+  "scraped_at": "2025-09-08T14:18:27.311+00:00",
+  "summarization": {
+    // Summary object from Summarization module
+  },
+  "sentiment": "Neutral",
+  "fact_check": {
+    "llm_verdict": false,
+    "fact_check_explanation": "The article claims that Jagdeep Dhankhar resigned as Vice President on…"
+  },
+  "article_score": {
+    "user_article_score": 5,
+    "llm_score": 6,
+    "final_custom_score": 5.6
+  },
+  "embedding": [/* Array of 768 dimensions */],
+  "rated_by": ["darshvaishnani1234@gmail.com"],
+  "processed_status": {
+    "summarized": true,
+    "fact_checked": true,
+    "sentiment": true,
+    "ner": true,
+    "scored": true
+  }
+}
+```
+
+**Key Fields:**
+- **`_id`**: Unique identifier (format: `{SOURCE}_{DATE}_{TIME}_{RANDOM}`)
+- **`source`**: News source abbreviation (e.g., "HT", "BBC", "CNN")
+- **`embedding`**: Vector embedding (768 dimensions) for similarity matching
+- **`article_score`**: Quality score from Article Scorer module
+- **`rated_by`**: Array of user emails who have rated this article
+
+---
+
+### ✅ **2. User Collection**
+
+Stores user profile information, preferences, and interaction history.
+
+**Collection Name:** `users` (or similar, as configured)
+
+**Document Structure:**
+```json
+{
+  "_id": "68be98c16b193cc8e8317f73",
+  "email": "darshvaishnani1234@gmail.com",
+  "name": "Darsh Vaishnani",
+  "picture": "https://lh3.googleusercontent.com/a/ACg8ocJ_ZBbPNqLG1JJikCsw90INemaPXd…",
+  "phone_number": "+919375981112",
+  "preferred_time": "01:38",
+  "rated_articles": ["BBC_20250908_141827_6617"],
+  "ner_data": {
+    "Person": [
+      "Rohit Arya",
+      "Deepak Kesarkar",
+      "Ashish Shelar",
+      "Mohsin Naqvi",
+      "Devajit Sakia",
+      "Shukla",
+      "Suryakumar Yadav",
+      "Salman Agha"
+    ],
+    "Location": [/* Array of location entities */],
+    "Organization": [/* Array of organization entities */]
+  },
+  "title_id_list": [
+    "IndianExpress_20251031_230549_6828",
+    "IndianExpress_20251001_004427_9329"
+  ],
+  "title_list": [
+    "Behind the Powai tragedy: Rohit Arya's long fight with Maharashtra's S…",
+    "BCCI ex-officio leaves ACC meeting midway in protest, says Mohsin Naqv…"
+  ],
+  "user_profile_vector": [/* Array of 384 dimensions - optional */],
+  "explicit_preferences": [/* Array of user-stated interests - optional */]
+}
+```
+
+**Key Fields:**
+- **`rated_articles`**: Array of article IDs the user has rated/liked
+- **`ner_data`**: Named entities extracted from user's liked articles
+- **`title_id_list`**: IDs of articles the user has interacted with
+- **`title_list`**: Titles of articles for quick reference
+- **`user_profile_vector`**: Pre-computed embedding vector for recommendations (optional, cached)
+
+---
+
+### ✅ **3. UserPreferenceAnalysis Collection**
+
+Stores the AI-generated detailed summary of user interests.
+
+**Collection Name:** `user_preference_analysis` (or similar, as configured)
+
+**Document Structure:**
+```json
+{
+  "_id": {
+    "$oid": "690516fce88e1f8c72949dee"
+  },
+  "email": "darshvaishnani1234@gmail.com",
+  "name": "Darsh Vaishnani",
+  "detailed_summary": "Based on the provided entities, the user seems to be interested in news related to education initiatives in India, particularly in Maharashtra (given mentions of 'School Education Department', 'Mazi Shala Sundar Shala', 'School Education Commissionerate', 'Powai', 'Pune', 'Mumbai'). They also seem interested in events and campaigns like 'Mahatma Gandhi Jayanti Se Sardar Patel Jayanti Tak', 'Vikasit Bharat Buildothon', 'Veer Gatha 5.0', 'Ek Ped Ma Ke Naam', and 'Mission Life Eco Club'. There's also a strong interest in cricket, with mentions of 'Suryakumar Yadav', 'Salman Agha', 'Board of Control for Cricket (BCCI)', 'Asian Cricket Council (ACC)', and 'Pakistan Cricket Board (PCB)', implying an interest in India-Pakistan cricket relations and tournaments possibly held in 'Dubai'. The user may also follow news from 'The Indian Express'.\n"
+}
+```
+
+**Purpose:** This collection stores the output from Step 2 of the Recommendation Pipeline (The Analysis Agent). The `detailed_summary` is the distilled interest paragraph that gets vectorized for recommendations.
+
+---
+
+### ✅ **4. RecommendedArticle Collection**
+
+Stores pre-computed article recommendations for each user.
+
+**Collection Name:** `recommended_articles` (or similar, as configured)
+
+**Document Structure:**
+```json
+{
+  "_id": {
+    "$oid": "690516ae8b1f3d3714c87f83"
+  },
+  "email": "darshvaishnani1234@gmail.com",
+  "articles": [
+    {
+      "_id": "IndianExpress_20251031_230549_6828",
+      "title": "Behind the Powai tragedy: Rohit Arya's long fight with Maharashtra's School Education Dept",
+      "similarity": 0.2422
+    },
+    {
+      "_id": "IndianExpress_20251001_004427_9329",
+      "title": "BCCI ex-officio leaves ACC meeting midway in protest, says Mohsin Naqvi gave no clarity over Asia Cup trophy",
+      "similarity": 0.2483
+    },
+    {
+      "_id": "TOI_20251001_004427_3699",
+      "title": "No flying school in India gets A+ or A in DGCA's first ever ranking",
+      "similarity": 0.1396
+    },
+    {
+      "_id": "IndianExpress_20250926_031021_9301",
+      "title": "Day after Ladakh violence, govt cancels FCRA licence of Wangchuk's NGO",
+      "similarity": 0.2252
+    },
+    {
+      "_id": "HT_20250926_031021_2081",
+      "title": "FCRA licence of Sonam Wangchuk's organisation cancelled over financial 'irregularities', he reacts",
+      "similarity": 0.2455
+    },
+    {
+      "_id": "TOI_20251031_230701_9744",
+      "title": "Journalist's death in UP: Priyanka says state government 'nurturing jungle raj'",
+      "similarity": 0.2882
+    },
+    {
+      "_id": "TOI_20250926_031021_7467",
+      "title": "Modi-Bibi ties have led to govt silence on 'genocide': Sonia Gandhi",
+      "similarity": 0.2721
+    },
+    {
+      "_id": "TOI_20251031_230130_7845",
+      "title": "Chirag Paswan: LJP implodes as uncle Paras isolates Chirag Paswan; Nitish Kumar's JD(U) says 'you reap what you sow'",
+      "similarity": 0.2439
+    },
+    {
+      "_id": "IndiaToday_20251031_230130_4500",
+      "title": "Usha has no plans to convert but…: JD Vance defends remarks on wife's faith",
+      "similarity": 0.2314
+    },
+    {
+      "_id": "HT_20251031_230701_6772",
+      "title": "'She has no plans to convert': JD Vance clarifies amid row over 'wife's conversion' remark",
+      "similarity": 0.1819
+    }
+  ]
+}
+```
+
+**Key Fields:**
+- **`email`**: User identifier
+- **`articles`**: Array of top 10 recommended articles
+  - **`_id`**: Article identifier
+  - **`title`**: Article title for display
+  - **`similarity`**: Cosine similarity score (0.0–1.0) indicating match quality
+
+**Purpose:** This collection caches the results from Step 5 of the Recommendation Pipeline, allowing quick retrieval of personalized recommendations without recalculating similarity scores on every request.
 
 ---
 
